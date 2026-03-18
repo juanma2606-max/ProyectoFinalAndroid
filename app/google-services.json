@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1093388237029",
+    "firebase_url": "https://proyectofinal-huerting-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "proyectofinal-huerting",
+    "storage_bucket": "proyectofinal-huerting.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1093388237029:android:b3671d4967d8df8f457c0c",
+        "android_client_info": {
+          "package_name": "com.example.proyectofinal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1093388237029-1q8oauh6d5amu2coqv6gqfcjmjtnfgqv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.proyectofinal",
+            "certificate_hash": "b9b3e222b84c3b27dc3bf54b7df2249f534cda3e"
+          }
+        },
+        {
+          "client_id": "1093388237029-2unumegunmue7aj5iak97k2vlj12c0ob.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAb4VjcJ1DNUVVhswPQj542tBCel4n-r_c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1093388237029-2unumegunmue7aj5iak97k2vlj12c0ob.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

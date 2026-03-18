@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1B2A1B">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="20dp"
+        android:orientation="vertical">
+
+        <!-- CARD PRINCIPAL -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- COLUMNA IZQUIERDA — decorativa -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:background="#2E4A2E"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🌱"
+                        android:textSize="72sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nueva\nPlantación"
+                        android:textColor="#A5D6A7"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:layout_marginTop="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Añade una planta\na tu huerto"
+                        android:textColor="#81C784"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:layout_marginTop="8dp" />
+
+                </LinearLayout>
+
+                <!-- COLUMNA DERECHA — formulario -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="24dp"
+                    android:background="#F8F9FA">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Añadir cultivo"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#2E7D32"
+                        android:gravity="center"
+                        android:paddingBottom="4dp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Selecciona la planta y su estado"
+                        android:textColor="#777777"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:paddingBottom="20dp" />
+
+                    <!-- SELECTOR DE PLANTA -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Planta"
+                        android:textStyle="bold"
+                        android:textColor="#333333"
+                        android:layout_marginBottom="6dp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerPlantas"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- NOTAS -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Notas"
+                        android:textStyle="bold"
+                        android:textColor="#333333"
+                        android:layout_marginBottom="4dp" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="18dp"
+                        app:boxStrokeColor="#2E7D32"
+                        app:hintTextColor="#2E7D32"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etNotas"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Observaciones (opcional)"
+                            android:inputType="textMultiLine"
+                            android:minLines="2"
+                            android:maxLines="3"
+                            android:gravity="top" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- ESTADO -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Estado inicial"
+                        android:textStyle="bold"
+                        android:textColor="#333333"
+                        android:layout_marginBottom="8dp" />
+
+                    <RadioGroup
+                        android:id="@+id/chipGroupEstado"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="24dp">
+
+                        <RadioButton
+                            android:id="@+id/chipCreciendo"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:text="🌱 Creciendo"
+                            android:checked="true"
+                            android:textColor="#2E7D32"
+                            android:textSize="14sp"
+                            android:buttonTint="#2E7D32"
+                            android:paddingStart="8dp" />
+
+                        <RadioButton
+                            android:id="@+id/chipCosechado"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:text="✅ Cosechado"
+                            android:textColor="#388E3C"
+                            android:textSize="14sp"
+                            android:buttonTint="#2E7D32"
+                            android:paddingStart="8dp" />
+
+                        <RadioButton
+                            android:id="@+id/chipPerdido"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:text="❌ Perdido"
+                            android:textColor="#C62828"
+                            android:textSize="14sp"
+                            android:buttonTint="#C62828"
+                            android:paddingStart="8dp" />
+
+                    </RadioGroup>
+
+                    <!-- BOTÓN GUARDAR -->
+                    <Button
+                        android:id="@+id/btnGuardar"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:text="Añadir cultivo"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="#2E7D32"
+                        android:layout_marginBottom="10dp" />
+
+                    <!-- BOTÓN CANCELAR -->
+                    <Button
+                        android:id="@+id/btnCancelar"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:text="Cancelar"
+                        android:textStyle="bold"
+                        android:textColor="#2E7D32"
+                        android:backgroundTint="@android:color/transparent"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="#2E7D32"
+                        app:strokeWidth="1dp" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Podrás cambiar el estado del cultivo en cualquier momento"
+            android:textColor="#A5D6A7"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp" />
+
+    </LinearLayout>
+</ScrollView>

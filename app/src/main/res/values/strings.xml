@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Proyecto final</string>
+    <string name="detalle_planta">Detalle de planta</string>
+    <string name="necesidades_caracteristicas">🌱 Necesidades y Características</string>
+    <string name="incompatibilidades">⚠️ Incompatibilidades</string>
+    <string name="plagas_enfermedades">🐛 Plagas y Enfermedades Comunes</string>
+    <string name="detalle_amenaza">Detalle de amenaza</string>
+    <string name="sintomas">🔍 Síntomas</string>
+    <string name="tratamiento">💊 Tratamiento</string>
+    <string name="descripcion_huerto">📋 Descripción del huerto</string>
+    <string name="mis_plantaciones">🌿 Mis plantaciones</string>
+    <string name="sin_plantaciones">Aún no tienes plantaciones</string>
+    <string name="instrucciones_agregar_planta">Pulsa el botón + para añadir tu primera planta</string>
+    <string name="volver">Volver</string>
+    <string name="imagen_planta">Imagen de la planta</string>
+    <string name="imagen_amenaza">Imagen de la amenaza</string>
+    <string name="imagen_huerto">Imagen del huerto</string>
+</resources>

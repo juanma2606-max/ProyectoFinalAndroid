@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Tejado -->
+    <path android:fillColor="#2E7D32"
+        android:pathData="M12,3 L22,11 L20,11 L20,21 L14,21 L14,15 L10,15 L10,21 L4,21 L4,11 L2,11 Z"/>
+    <!-- Hoja izquierda -->
+    <path android:fillColor="#66BB6A"
+        android:pathData="M4,13 Q1,10 3,7 Q5,10 4,13 Z"/>
+    <!-- Hoja derecha -->
+    <path android:fillColor="#66BB6A"
+        android:pathData="M20,13 Q23,10 21,7 Q19,10 20,13 Z"/>
+</vector>

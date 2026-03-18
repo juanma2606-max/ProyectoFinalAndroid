@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="14dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="5dp"
+    app:cardBackgroundColor="#263226"
+    app:strokeColor="#3A5A3A"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- IMAGEN — equivalente a [src] condicional parcela/maceta -->
+        <ImageView
+            android:id="@+id/imgHuerto"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:scaleType="centerCrop"
+            android:background="#1B3A1B" />
+
+        <!-- BADGE TIPO — superpuesto sobre la imagen -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="2dp">
+
+            <TextView
+                android:id="@+id/txtTipoHuerto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"/>
+
+        </LinearLayout>
+
+        <!-- NOMBRE — equivalente a {{ huerto?.nombre || 'Sin nombre' }} -->
+        <TextView
+            android:id="@+id/txtNombreHuerto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="2dp"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF" />
+
+        <!-- DESCRIPCIÓN -->
+        <TextView
+            android:id="@+id/txtDescripcionHuerto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="12dp"
+            android:textSize="13sp"
+            android:textColor="#A5D6A7"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <!-- DIVISOR -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#3A5A3A" />
+
+        <!-- BOTONES DE ACCIÓN — equivalente a Eliminar / Editar / Ver -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:background="#1E2E1E">
+
+            <!-- ELIMINAR — equivalente a (click)="onDelete()" + modal -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEliminarHuerto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="🗑 Eliminar"
+                android:textSize="13sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#C62828"
+                app:cornerRadius="10dp"
+                style="@style/Widget.MaterialComponents.Button" />
+
+            <!-- EDITAR — equivalente a (click)="onEdit()" -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditarHuerto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="✏ Editar"
+                android:textSize="13sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#E65100"
+                app:cornerRadius="10dp"
+                style="@style/Widget.MaterialComponents.Button" />
+
+            <!-- VER — equivalente al routerLink parcela/maceta -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVerHuerto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="👁 Ver"
+                android:textSize="13sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#2E7D32"
+                app:cornerRadius="10dp"
+                style="@style/Widget.MaterialComponents.Button" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
