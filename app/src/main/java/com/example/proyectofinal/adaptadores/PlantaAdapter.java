@@ -43,9 +43,53 @@ public class PlantaAdapter extends RecyclerView.Adapter<PlantaAdapter.PlantaView
     @Override
     public void onBindViewHolder(@NonNull PlantaViewHolder holder, int position) {
         Planta p = plantas.get(position);
-        holder.txtNombre.setText(p.nombre);
 
-        cargarImagenPorTipo(holder.imgPlanta, p.tipo);
+        // Nombre
+        holder.txtNombre.setText(p.getNombre());
+
+        // Nombre científico (si existe en layout)
+        if (holder.txtNombreCientifico != null) {
+            if (p.getNombreCientifico() != null && !p.getNombreCientifico().isEmpty()) {
+                holder.txtNombreCientifico.setText(p.getNombreCientifico());
+                holder.txtNombreCientifico.setVisibility(View.VISIBLE);
+            } else {
+                holder.txtNombreCientifico.setVisibility(View.GONE);
+            }
+        }
+
+        // Tipo con capitalizado
+        if (holder.txtTipo != null) {
+            holder.txtTipo.setText(p.getTipoCapitalizado());
+        }
+
+        // Tiempo crecimiento
+        if (holder.txtTiempo != null) {
+            holder.txtTiempo.setText(p.getTiempoCrecimientoTexto());
+        }
+
+        // Riego
+        if (holder.txtRiego != null) {
+            holder.txtRiego.setText("💧 " + (p.getRiego() != null ? p.getRiego() : "-"));
+        }
+
+        // Luz
+        if (holder.txtLuz != null) {
+            String emojiLuz = getEmojiLuz(p.getLuz());
+            holder.txtLuz.setText(emojiLuz + " " + (p.getLuz() != null ? p.getLuz() : "-"));
+        }
+
+        // Imagen
+        if (p.getImagen() != null && !p.getImagen().isEmpty()) {
+            // Cargar desde URL (Firebase)
+            Picasso.get()
+                    .load(p.getImagen())
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .error(R.drawable.ic_launcher_background)
+                    .into(holder.imgPlanta);
+        } else {
+            // Fallback: imagen según tipo desde assets
+            cargarImagenPorTipo(holder.imgPlanta, p.getTipo());
+        }
 
         holder.itemView.setOnClickListener(v -> listener.onClick(p));
     }
@@ -60,15 +104,47 @@ public class PlantaAdapter extends RecyclerView.Adapter<PlantaAdapter.PlantaView
         notifyDataSetChanged();
     }
 
+    // ---------------------------------------------------------
+    // Emoji según nivel de luz
+    // ---------------------------------------------------------
+    private String getEmojiLuz(String luz) {
+        if (luz == null) return "☀️";
+        switch (luz.toLowerCase()) {
+            case "sombra":
+                return "🌑";
+            case "semi-sombra":
+                return "⛅";
+            case "pleno-sol":
+                return "☀️";
+            default:
+                return "☀️";
+        }
+    }
+
+    // ---------------------------------------------------------
+    // Imagen según tipo de planta desde assets (fallback)
+    // ---------------------------------------------------------
     private void cargarImagenPorTipo(ImageView imgView, String tipo) {
         String nombreArchivo;
         switch (tipo != null ? tipo : "") {
-            case "arbol":     nombreArchivo = "manzano.webp"; break;
-            case "hierba":    nombreArchivo = "romero.webp";  break;
-            case "flor":      nombreArchivo = "rosas.webp";   break;
-            case "hortaliza": nombreArchivo = "tomates.webp"; break;
-            case "fruta":     nombreArchivo = "sandias.webp"; break;
-            default:          nombreArchivo = "tomates.webp"; break;
+            case "arbol":
+                nombreArchivo = "manzano.webp";
+                break;
+            case "hierba":
+                nombreArchivo = "romero.webp";
+                break;
+            case "flor":
+                nombreArchivo = "rosas.webp";
+                break;
+            case "hortaliza":
+                nombreArchivo = "tomates.webp";
+                break;
+            case "fruta":
+                nombreArchivo = "sandias.webp";
+                break;
+            default:
+                nombreArchivo = "tomates.webp";
+                break;
         }
 
         Picasso.get()
@@ -78,14 +154,27 @@ public class PlantaAdapter extends RecyclerView.Adapter<PlantaAdapter.PlantaView
                 .into(imgView);
     }
 
+    // ---------------------------------------------------------
+    // ViewHolder
+    // ---------------------------------------------------------
     static class PlantaViewHolder extends RecyclerView.ViewHolder {
         ImageView imgPlanta;
         TextView txtNombre;
+        TextView txtNombreCientifico;
+        TextView txtTipo;
+        TextView txtTiempo;
+        TextView txtRiego;
+        TextView txtLuz;
 
         public PlantaViewHolder(@NonNull View itemView) {
             super(itemView);
             imgPlanta = itemView.findViewById(R.id.imgPlanta);
             txtNombre = itemView.findViewById(R.id.txtNombre);
+            txtNombreCientifico = itemView.findViewById(R.id.txtNombreCientifico);
+            txtTipo = itemView.findViewById(R.id.txtTipoPlanta);
+            txtTiempo = itemView.findViewById(R.id.txtTiempoPlanta);
+            txtRiego = itemView.findViewById(R.id.txtRiegoPlanta);
+            txtLuz = itemView.findViewById(R.id.txtLuzPlanta);
         }
     }
 }

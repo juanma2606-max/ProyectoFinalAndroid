@@ -32,30 +32,101 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
+            <!-- HEADER: Nombre cultivo + warning -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp"
+                android:paddingBottom="6dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Nombre personalizado cultivo -->
+                    <TextView
+                        android:id="@+id/txtNombreCultivo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mi cultivo"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#1B5E20"
+                        android:visibility="gone" />
+
+                    <!-- Cantidad y fecha -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="2dp">
+
+                        <TextView
+                            android:id="@+id/txtCantidadCultivo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="5 plantas"
+                            android:textSize="11sp"
+                            android:textColor="#666666" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" • "
+                            android:textSize="11sp"
+                            android:textColor="#666666" />
+
+                        <TextView
+                            android:id="@+id/txtFechaSiembra"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sembrado: 24/04/2026"
+                            android:textSize="11sp"
+                            android:textColor="#666666" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Warning icon si enfermo -->
+                <ImageView
+                    android:id="@+id/iconWarning"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_dialog_alert"
+                    android:tint="#FFC107"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
             <!-- DATOS DE LA PLANTA -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Necesidades de la planta"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     android:textColor="#1B5E20"
-                    android:layout_marginBottom="10dp" />
+                    android:layout_marginBottom="6dp" />
 
-                <!-- NOMBRE -->
+                <!-- NOMBRE PLANTA -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp">
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
 
                     <TextView
                         android:layout_width="0dp"
@@ -63,7 +134,7 @@
                         android:layout_weight="1"
                         android:text="Planta"
                         android:textColor="#555555"
-                        android:textSize="13sp" />
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/txtNombrePlanta"
@@ -71,11 +142,13 @@
                         android:layout_height="wrap_content"
                         android:textColor="#1B5E20"
                         android:textStyle="bold"
-                        android:textSize="13sp" />
-
+                        android:textSize="12sp" />
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E8F5E9"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E8F5E9" />
 
                 <!-- RIEGO -->
                 <LinearLayout
@@ -83,8 +156,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp">
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
 
                     <TextView
                         android:layout_width="0dp"
@@ -92,7 +165,7 @@
                         android:layout_weight="1"
                         android:text="Tipo de riego"
                         android:textColor="#555555"
-                        android:textSize="13sp" />
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/txtRiegoCultivo"
@@ -100,11 +173,13 @@
                         android:layout_height="wrap_content"
                         android:textColor="#333333"
                         android:textStyle="bold"
-                        android:textSize="13sp" />
-
+                        android:textSize="12sp" />
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E8F5E9"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E8F5E9" />
 
                 <!-- ABONO -->
                 <LinearLayout
@@ -112,8 +187,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp">
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
 
                     <TextView
                         android:layout_width="0dp"
@@ -121,7 +196,7 @@
                         android:layout_weight="1"
                         android:text="Abono necesario"
                         android:textColor="#555555"
-                        android:textSize="13sp" />
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/txtAbonoCultivo"
@@ -129,11 +204,13 @@
                         android:layout_height="wrap_content"
                         android:textColor="#333333"
                         android:textStyle="bold"
-                        android:textSize="13sp" />
-
+                        android:textSize="12sp" />
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E8F5E9"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E8F5E9" />
 
                 <!-- TIEMPO CRECIMIENTO -->
                 <LinearLayout
@@ -141,8 +218,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp">
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
 
                     <TextView
                         android:layout_width="0dp"
@@ -150,7 +227,7 @@
                         android:layout_weight="1"
                         android:text="Tiempo de crecimiento"
                         android:textColor="#555555"
-                        android:textSize="13sp" />
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/txtTiempoCultivo"
@@ -158,11 +235,13 @@
                         android:layout_height="wrap_content"
                         android:textColor="#333333"
                         android:textStyle="bold"
-                        android:textSize="13sp" />
-
+                        android:textSize="12sp" />
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E8F5E9"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E8F5E9" />
 
                 <!-- ESTADO -->
                 <LinearLayout
@@ -170,8 +249,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp">
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
 
                     <TextView
                         android:layout_width="0dp"
@@ -179,18 +258,28 @@
                         android:layout_weight="1"
                         android:text="Estado"
                         android:textColor="#555555"
-                        android:textSize="13sp" />
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/txtEstadoCultivo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textStyle="bold"
-                        android:textSize="13sp" />
-
+                        android:textSize="12sp" />
                 </LinearLayout>
 
             </LinearLayout>
+
+            <!-- NOTAS (visible solo si hay) -->
+            <TextView
+                android:id="@+id/txtNotasCultivo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFF9C4"
+                android:padding="8dp"
+                android:textSize="11sp"
+                android:textColor="#856404"
+                android:visibility="gone" />
 
             <!-- DIVISOR -->
             <View

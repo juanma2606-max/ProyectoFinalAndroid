@@ -13,13 +13,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyectofinal.R;
 import com.example.proyectofinal.modelos.Huerto;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class HuertoAdapter extends RecyclerView.Adapter<HuertoAdapter.ViewHolder> {
 
     // ---------------------------------------------------------
-    // Interfaz de acciones — equivalente a @Output() en Angular
+    // Interfaz de acciones
     // ---------------------------------------------------------
     public interface OnHuertoActionListener {
         void onVer(Huerto huerto);
@@ -32,8 +33,8 @@ public class HuertoAdapter extends RecyclerView.Adapter<HuertoAdapter.ViewHolder
     private final OnHuertoActionListener listener;
 
     public HuertoAdapter(Context context, List<Huerto> lista, OnHuertoActionListener listener) {
-        this.context  = context;
-        this.lista    = lista;
+        this.context = context;
+        this.lista = lista;
         this.listener = listener;
     }
 
@@ -53,25 +54,72 @@ public class HuertoAdapter extends RecyclerView.Adapter<HuertoAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Huerto huerto = lista.get(position);
 
-        // Nombre — equivalente a {{ huerto?.nombre || 'Sin nombre' }}
-        holder.txtNombre.setText(huerto.nombre != null ? huerto.nombre : "Sin nombre");
+        // Nombre
+        holder.txtNombre.setText(huerto.getNombre() != null
+                ? huerto.getNombre()
+                : "Sin nombre");
 
         // Descripción
-        holder.txtDescripcion.setText(huerto.descripcion != null ? huerto.descripcion : "");
+        if (huerto.getDescripcion() != null && !huerto.getDescripcion().isEmpty()) {
+            holder.txtDescripcion.setText(huerto.getDescripcion());
+            holder.txtDescripcion.setVisibility(View.VISIBLE);
+        } else {
+            holder.txtDescripcion.setVisibility(View.GONE);
+        }
 
-        // Badge de tipo — equivalente al condicional [src] según tipo
-        boolean esParcela = "parcela".equals(huerto.tipo);
-        holder.txtTipo.setText(esParcela ? "🌱 Parcela" : "🪴 Maceta");
+        // Ubicación
+        if (holder.txtUbicacion != null) {
+            if (huerto.getUbicacion() != null && !huerto.getUbicacion().isEmpty()) {
+                holder.txtUbicacion.setText("📍 " + huerto.getUbicacion());
+                holder.txtUbicacion.setVisibility(View.VISIBLE);
+            } else {
+                holder.txtUbicacion.setVisibility(View.GONE);
+            }
+        }
 
-        // Imagen según tipo — equivalente a [src] condicional del html
-        holder.imgHuerto.setImageResource(esParcela
-                ? R.drawable.img_parcela
-                : R.drawable.img_maceta);
+        // Superficie
+        if (holder.txtSuperficie != null) {
+            holder.txtSuperficie.setText("📏 " + huerto.getSuperficieTexto());
+        }
 
-        // Botones — equivalente a (click)="onEdit()", (click)="onDelete()", routerLink ver
-        holder.btnVer.setOnClickListener(v      -> listener.onVer(huerto));
-        holder.btnEditar.setOnClickListener(v   -> listener.onEditar(huerto));
-        holder.btnEliminar.setOnClickListener(v -> listener.onEliminar(huerto));
+        // Tipo suelo
+        if (holder.txtTipoSuelo != null) {
+            holder.txtTipoSuelo.setText("🌱 " + huerto.getTipoSueloCapitalizado());
+        }
+
+        // Horas sol
+        if (holder.txtHorasSol != null) {
+            holder.txtHorasSol.setText("☀️ " + huerto.getHorasSolTexto());
+        }
+
+        // Riego
+        if (holder.txtRiego != null) {
+            holder.txtRiego.setText("💧 " + huerto.getRiegoTexto());
+        }
+
+        // Imagen del huerto
+        if (huerto.tieneFoto()) {
+            Picasso.get()
+                    .load(huerto.getFoto())
+                    .placeholder(R.drawable.img_huerto_default)
+                    .error(R.drawable.img_huerto_default)
+                    .into(holder.imgHuerto);
+        } else {
+            holder.imgHuerto.setImageResource(R.drawable.img_huerto_default);
+        }
+
+        // CARD CLICKEABLE = VER HUERTO
+        holder.itemView.setOnClickListener(v -> listener.onVer(huerto));
+
+        // FAB EDITAR
+        if (holder.btnEditar != null) {
+            holder.btnEditar.setOnClickListener(v -> listener.onEditar(huerto));
+        }
+
+        // FAB ELIMINAR
+        if (holder.btnEliminar != null) {
+            holder.btnEliminar.setOnClickListener(v -> listener.onEliminar(huerto));
+        }
     }
 
     @Override
@@ -82,20 +130,30 @@ public class HuertoAdapter extends RecyclerView.Adapter<HuertoAdapter.ViewHolder
     // ---------------------------------------------------------
     // ViewHolder
     // ---------------------------------------------------------
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgHuerto;
-        TextView txtNombre, txtDescripcion, txtTipo;
-        Button btnVer, btnEditar, btnEliminar;
+        TextView txtNombre;
+        TextView txtDescripcion;
+        TextView txtUbicacion;
+        TextView txtSuperficie;
+        TextView txtTipoSuelo;
+        TextView txtHorasSol;
+        TextView txtRiego;
+        View btnEditar;  // FAB
+        View btnEliminar;  // FAB
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            imgHuerto      = itemView.findViewById(R.id.imgHuerto);
-            txtNombre      = itemView.findViewById(R.id.txtNombreHuerto);
+            imgHuerto = itemView.findViewById(R.id.imgHuerto);
+            txtNombre = itemView.findViewById(R.id.txtNombreHuerto);
             txtDescripcion = itemView.findViewById(R.id.txtDescripcionHuerto);
-            txtTipo        = itemView.findViewById(R.id.txtTipoHuerto);
-            btnVer         = itemView.findViewById(R.id.btnVerHuerto);
-            btnEditar      = itemView.findViewById(R.id.btnEditarHuerto);
-            btnEliminar    = itemView.findViewById(R.id.btnEliminarHuerto);
+            txtUbicacion = itemView.findViewById(R.id.txtUbicacionHuerto);
+            txtSuperficie = itemView.findViewById(R.id.txtSuperficieHuerto);
+            txtTipoSuelo = itemView.findViewById(R.id.txtTipoSueloHuerto);
+            txtHorasSol = itemView.findViewById(R.id.txtHorasSolHuerto);
+            txtRiego = itemView.findViewById(R.id.txtRiegoHuerto);
+            btnEditar = itemView.findViewById(R.id.btnEditarHuerto);
+            btnEliminar = itemView.findViewById(R.id.btnEliminarHuerto);
         }
     }
 }

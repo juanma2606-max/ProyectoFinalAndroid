@@ -20,7 +20,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-
 import java.util.List;
 
 public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHolder> {
@@ -39,9 +38,9 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
     private final PlantaDAO plantaDAO;
 
     public CultivoAdapter(Context context, List<Cultivo> lista, OnCultivoActionListener listener) {
-        this.context   = context;
-        this.lista     = lista;
-        this.listener  = listener;
+        this.context = context;
+        this.lista = lista;
+        this.listener = listener;
         this.plantaDAO = new PlantaDAO();
     }
 
@@ -61,51 +60,108 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Cultivo cultivo = lista.get(position);
 
-        // Estado con color
-        setEstadoColor(holder.txtEstado, cultivo.estado);
+        // Nombre del cultivo (campo nuevo)
+        if (cultivo.getNombre() != null && !cultivo.getNombre().isEmpty()) {
+            holder.txtNombreCultivo.setText(cultivo.getNombre());
+            holder.txtNombreCultivo.setVisibility(View.VISIBLE);
+        } else {
+            holder.txtNombreCultivo.setVisibility(View.GONE);
+        }
+
+        // Cantidad (campo nuevo)
+        if (holder.txtCantidad != null) {
+            holder.txtCantidad.setText(cultivo.getCantidadTexto());
+        }
+
+        // Estado con color y texto
+        holder.txtEstado.setText(cultivo.getEstadoTexto());
+        holder.txtEstado.setTextColor(cultivo.getEstadoColor());
+
+        // Warning si enfermo
+        if (holder.iconWarning != null) {
+            if (cultivo.estaEnfermo()) {
+                holder.iconWarning.setVisibility(View.VISIBLE);
+            } else {
+                holder.iconWarning.setVisibility(View.GONE);
+            }
+        }
+
+        // Fecha siembra
+        if (holder.txtFechaSiembra != null && cultivo.getFechaSiembra() != null) {
+            String fecha = formatearFecha(cultivo.getFechaSiembra());
+            holder.txtFechaSiembra.setText("Sembrado: " + fecha);
+        }
+
+        // Notas
+        if (holder.txtNotas != null) {
+            if (cultivo.tieneNotas()) {
+                holder.txtNotas.setText(cultivo.getNotas());
+                holder.txtNotas.setVisibility(View.VISIBLE);
+            } else {
+                holder.txtNotas.setVisibility(View.GONE);
+            }
+        }
 
         // Consulta secundaria a PlantaDAO para obtener los datos de la planta
-        plantaDAO.getPlantaById(cultivo.plantaId, new ValueEventListener() {
+        plantaDAO.getPlantaById(cultivo.getPlantaId(), new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Planta planta = snapshot.getValue(Planta.class);
                 if (planta == null) return;
 
-                holder.txtNombrePlanta.setText(planta.nombre);
-                holder.txtRiego.setText(planta.riego != null ? planta.riego : "-");
-                holder.txtAbono.setText(planta.abono != null ? planta.abono : "-");
-                holder.txtTiempo.setText(planta.tiempoCrecimiento != null ? planta.tiempoCrecimiento : "-");
+                holder.txtNombrePlanta.setText(planta.getNombre());
 
-                // Imagen según tipo de planta
-                cargarImagenPorTipo(holder.imgCultivo, planta.tipo);
+                if (holder.txtRiego != null) {
+                    holder.txtRiego.setText(planta.getRiego() != null
+                            ? planta.getRiego() : "-");
+                }
+
+                if (holder.txtAbono != null) {
+                    holder.txtAbono.setText(planta.getAbono() != null
+                            ? planta.getAbono() : "-");
+                }
+
+                if (holder.txtTiempo != null) {
+                    holder.txtTiempo.setText(planta.getTiempoCrecimientoTexto());
+                }
+
+                // Cargar imagen de la planta
+                if (planta.getImagen() != null && !planta.getImagen().isEmpty()) {
+                    Picasso.get()
+                            .load(planta.getImagen())
+                            .placeholder(R.drawable.ic_launcher_background)
+                            .error(R.drawable.ic_launcher_background)
+                            .into(holder.imgCultivo);
+                } else {
+                    cargarImagenPorTipo(holder.imgCultivo, planta.getTipo());
+                }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+                holder.txtNombrePlanta.setText("Planta desconocida");
+            }
         });
 
-        holder.btnVer.setOnClickListener(v      -> listener.onVer(cultivo));
+        holder.btnVer.setOnClickListener(v -> listener.onVer(cultivo));
         holder.btnEliminar.setOnClickListener(v -> listener.onEliminar(cultivo));
     }
 
     // ---------------------------------------------------------
-    // Color del badge de estado
+    // Formatear fecha ISO a formato legible
     // ---------------------------------------------------------
-    private void setEstadoColor(TextView txt, String estado) {
-        if (estado == null) return;
-        switch (estado) {
-            case "cosechado":
-                txt.setText("✅ Cosechado");
-                txt.setTextColor(0xFF2E7D32);
-                break;
-            case "perdido":
-                txt.setText("❌ Perdido");
-                txt.setTextColor(0xFFC62828);
-                break;
-            default:
-                txt.setText("🌱 Creciendo");
-                txt.setTextColor(0xFF388E3C);
-                break;
+    private String formatearFecha(String fechaISO) {
+        try {
+            if (fechaISO != null && fechaISO.length() >= 10) {
+                String fecha = fechaISO.substring(0, 10);
+                String[] partes = fecha.split("-");
+                if (partes.length == 3) {
+                    return partes[2] + "/" + partes[1] + "/" + partes[0];
+                }
+            }
+            return fechaISO;
+        } catch (Exception e) {
+            return fechaISO;
         }
     }
 
@@ -115,17 +171,29 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
     }
 
     // ---------------------------------------------------------
-    // Imagen según tipo de planta desde assets
+    // Imagen según tipo de planta desde assets (fallback)
     // ---------------------------------------------------------
     private void cargarImagenPorTipo(ImageView imgView, String tipo) {
         String nombreArchivo;
         switch (tipo != null ? tipo : "") {
-            case "arbol":     nombreArchivo = "manzano.webp"; break;
-            case "hierba":    nombreArchivo = "romero.webp";  break;
-            case "flor":      nombreArchivo = "rosas.webp";   break;
-            case "hortaliza": nombreArchivo = "tomates.webp"; break;
-            case "fruta":     nombreArchivo = "sandias.webp"; break;
-            default:          nombreArchivo = "tomates.webp"; break;
+            case "arbol":
+                nombreArchivo = "manzano.webp";
+                break;
+            case "hierba":
+                nombreArchivo = "romero.webp";
+                break;
+            case "flor":
+                nombreArchivo = "rosas.webp";
+                break;
+            case "hortaliza":
+                nombreArchivo = "tomates.webp";
+                break;
+            case "fruta":
+                nombreArchivo = "sandias.webp";
+                break;
+            default:
+                nombreArchivo = "tomates.webp";
+                break;
         }
         Picasso.get()
                 .load("file:///android_asset/" + nombreArchivo)
@@ -137,21 +205,36 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
     // ---------------------------------------------------------
     // ViewHolder
     // ---------------------------------------------------------
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgCultivo;
-        TextView txtNombrePlanta, txtRiego, txtAbono, txtTiempo, txtEstado;
-        Button btnVer, btnEliminar;
+        ImageView iconWarning;
+        TextView txtNombreCultivo;
+        TextView txtNombrePlanta;
+        TextView txtCantidad;
+        TextView txtRiego;
+        TextView txtAbono;
+        TextView txtTiempo;
+        TextView txtEstado;
+        TextView txtFechaSiembra;
+        TextView txtNotas;
+        Button btnVer;
+        Button btnEliminar;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            imgCultivo      = itemView.findViewById(R.id.imgCultivo);
+            imgCultivo = itemView.findViewById(R.id.imgCultivo);
+            iconWarning = itemView.findViewById(R.id.iconWarning);
+            txtNombreCultivo = itemView.findViewById(R.id.txtNombreCultivo);
             txtNombrePlanta = itemView.findViewById(R.id.txtNombrePlanta);
-            txtRiego        = itemView.findViewById(R.id.txtRiegoCultivo);
-            txtAbono        = itemView.findViewById(R.id.txtAbonoCultivo);
-            txtTiempo       = itemView.findViewById(R.id.txtTiempoCultivo);
-            txtEstado       = itemView.findViewById(R.id.txtEstadoCultivo);
-            btnVer          = itemView.findViewById(R.id.btnVerCultivo);
-            btnEliminar     = itemView.findViewById(R.id.btnEliminarCultivo);
+            txtCantidad = itemView.findViewById(R.id.txtCantidadCultivo);
+            txtRiego = itemView.findViewById(R.id.txtRiegoCultivo);
+            txtAbono = itemView.findViewById(R.id.txtAbonoCultivo);
+            txtTiempo = itemView.findViewById(R.id.txtTiempoCultivo);
+            txtEstado = itemView.findViewById(R.id.txtEstadoCultivo);
+            txtFechaSiembra = itemView.findViewById(R.id.txtFechaSiembra);
+            txtNotas = itemView.findViewById(R.id.txtNotasCultivo);
+            btnVer = itemView.findViewById(R.id.btnVerCultivo);
+            btnEliminar = itemView.findViewById(R.id.btnEliminarCultivo);
         }
     }
 }

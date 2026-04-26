@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,6 +25,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +33,12 @@ import java.util.List;
 public class HuertoDetalleActivity extends AppCompatActivity {
 
     private TextView txtNombreHuerto, txtDescripcionHuerto;
+    private TextView txtUbicacion, txtSuperficie, txtTipoSuelo;
+    private TextView txtHorasSol, txtRiego, txtNotas;
     private ImageView imgHuerto;
+    private LinearLayout layoutInfoExtra, emptyStateCultivos;
     private RecyclerView recyclerCultivos;
-    private LinearLayout emptyStateCultivos;
+
     private CultivoAdapter cultivoAdapter;
     private final List<Cultivo> cultivos = new ArrayList<>();
 
@@ -44,6 +47,7 @@ public class HuertoDetalleActivity extends AppCompatActivity {
     private ValueEventListener cultivoListener;
 
     private String huertoId;
+    private Huerto huertoActual;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,21 +58,33 @@ public class HuertoDetalleActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        huertoDAO  = new HuertoDAO();
+        huertoDAO = new HuertoDAO();
         cultivoDAO = new CultivoDAO();
 
-        txtNombreHuerto      = findViewById(R.id.txtNombreHuerto);
+        // Referencias vistas básicas
+        txtNombreHuerto = findViewById(R.id.txtNombreHuerto);
         txtDescripcionHuerto = findViewById(R.id.txtDescripcionHuerto);
-        imgHuerto            = findViewById(R.id.imgHuertoDetalle);
-        recyclerCultivos     = findViewById(R.id.recyclerCultivos);
-        emptyStateCultivos   = findViewById(R.id.emptyStateCultivos);
+        imgHuerto = findViewById(R.id.imgHuertoDetalle);
+
+        // Referencias vistas nuevas (si existen en layout)
+        txtUbicacion = findViewById(R.id.txtUbicacion);
+        txtSuperficie = findViewById(R.id.txtSuperficie);
+        txtTipoSuelo = findViewById(R.id.txtTipoSuelo);
+        txtHorasSol = findViewById(R.id.txtHorasSol);
+        txtRiego = findViewById(R.id.txtRiego);
+        txtNotas = findViewById(R.id.txtNotas);
+        layoutInfoExtra = findViewById(R.id.layoutInfoExtra);
+
+        // RecyclerView cultivos
+        recyclerCultivos = findViewById(R.id.recyclerCultivos);
+        emptyStateCultivos = findViewById(R.id.emptyStateCultivos);
 
         recyclerCultivos.setLayoutManager(new LinearLayoutManager(this));
         cultivoAdapter = new CultivoAdapter(this, cultivos, new CultivoAdapter.OnCultivoActionListener() {
             @Override
             public void onVer(Cultivo cultivo) {
                 Intent i = new Intent(HuertoDetalleActivity.this, PlantaDetalleActivity.class);
-                i.putExtra("id", cultivo.plantaId);
+                i.putExtra("id", cultivo.getPlantaId());
                 startActivity(i);
             }
 
@@ -81,55 +97,129 @@ public class HuertoDetalleActivity extends AppCompatActivity {
 
         // Botón volver
         ImageButton btnVolver = findViewById(R.id.btnVolver);
-        btnVolver.setOnClickListener(v -> finish());
+        if (btnVolver != null) {
+            btnVolver.setOnClickListener(v -> finish());
+        }
+
+        // Botón editar (si existe en layout)
+        ImageButton btnEditar = findViewById(R.id.btnEditarHuerto);
+        if (btnEditar != null) {
+            btnEditar.setOnClickListener(v -> {
+                Intent i = new Intent(this, EditarHuertoActivity.class);
+                i.putExtra("huertoId", huertoId);
+                startActivity(i);
+            });
+        }
 
         // FAB agregar cultivo
         FloatingActionButton fab = findViewById(R.id.fabAgregarCultivo);
-        fab.setOnClickListener(v -> {
-            Intent i = new Intent(this, AgregarCultivoActivity.class);
-            i.putExtra("huertoId", huertoId);
-            startActivity(i);
-        });
+        if (fab != null) {
+            fab.setOnClickListener(v -> {
+                Intent i = new Intent(this, AgregarCultivoActivity.class);
+                i.putExtra("huertoId", huertoId);
+                startActivity(i);
+            });
+        }
 
         // Recibir el ID del huerto
         huertoId = getIntent().getStringExtra("huertoId");
+        if (huertoId == null || huertoId.isEmpty()) {
+            Toast.makeText(this, "Error: ID de huerto no válido", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         cargarHuerto();
         cargarCultivos();
     }
 
     // ---------------------------------------------------------
-    // Carga los datos del huerto — equivalente a getHuertoById()
+    // Carga los datos del huerto con nuevo modelo
     // ---------------------------------------------------------
     private void cargarHuerto() {
-        huertoDAO.getHuertoById(huertoId, new ValueEventListener() {
+        huertoDAO.getHuertoById(huertoId, new HuertoDAO.OnHuertoLoadedCallback() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Huerto huerto = snapshot.getValue(Huerto.class);
-                if (huerto == null) return;
-
-                txtNombreHuerto.setText(huerto.nombre);
-                txtDescripcionHuerto.setText(
-                        huerto.descripcion != null && !huerto.descripcion.isEmpty()
-                                ? huerto.descripcion
-                                : "Sin descripción");
-
-                // Imagen según tipo
-                boolean esParcela = "parcela".equals(huerto.tipo);
-                imgHuerto.setImageResource(esParcela
-                        ? R.drawable.img_parcela
-                        : R.drawable.img_maceta);
-
-                if (getSupportActionBar() != null) {
-                    getSupportActionBar().setTitle(huerto.nombre);
-                }
+            public void onLoaded(Huerto huerto) {
+                huertoActual = huerto;
+                mostrarDatosHuerto(huerto);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onError(Exception e) {
                 Toast.makeText(HuertoDetalleActivity.this,
-                        "Error al cargar el huerto", Toast.LENGTH_SHORT).show();
+                        "Error al cargar huerto: " + e.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
+    }
+
+    // ---------------------------------------------------------
+    // Mostrar datos del huerto en UI
+    // ---------------------------------------------------------
+    private void mostrarDatosHuerto(Huerto huerto) {
+        // Datos básicos
+        txtNombreHuerto.setText(huerto.getNombre());
+
+        String descripcion = huerto.getDescripcion();
+        if (descripcion != null && !descripcion.isEmpty()) {
+            txtDescripcionHuerto.setText(descripcion);
+            txtDescripcionHuerto.setVisibility(View.VISIBLE);
+        } else {
+            txtDescripcionHuerto.setVisibility(View.GONE);
+        }
+
+        // Imagen
+        if (huerto.tieneFoto()) {
+            Picasso.get()
+                    .load(huerto.getFoto())
+                    .placeholder(R.drawable.img_huerto_default)
+                    .error(R.drawable.img_huerto_default)
+                    .into(imgHuerto);
+        } else {
+            imgHuerto.setImageResource(R.drawable.img_huerto_default);
+        }
+
+        // Datos adicionales (si los TextViews existen en layout)
+        if (txtUbicacion != null) {
+            String ubicacion = huerto.getUbicacion();
+            if (ubicacion != null && !ubicacion.isEmpty()) {
+                txtUbicacion.setText("📍 " + ubicacion);
+                txtUbicacion.setVisibility(View.VISIBLE);
+            } else {
+                txtUbicacion.setVisibility(View.GONE);
+            }
+        }
+
+        if (txtSuperficie != null) {
+            txtSuperficie.setText("📏 " + huerto.getSuperficieTexto());
+        }
+
+        if (txtTipoSuelo != null) {
+            txtTipoSuelo.setText("🌱 Suelo: " + huerto.getTipoSueloCapitalizado());
+        }
+
+        if (txtHorasSol != null) {
+            txtHorasSol.setText("☀️ " + huerto.getHorasSolTexto());
+        }
+
+        if (txtRiego != null) {
+            txtRiego.setText("💧 Riego: " + huerto.getRiegoTexto());
+        }
+
+        if (txtNotas != null) {
+            if (huerto.tieneNotas()) {
+                txtNotas.setText(huerto.getNotas());
+                txtNotas.setVisibility(View.VISIBLE);
+            } else {
+                txtNotas.setVisibility(View.GONE);
+            }
+        }
+
+        // ActionBar título
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(huerto.getNombre());
+        }
     }
 
     // ---------------------------------------------------------
@@ -143,7 +233,7 @@ public class HuertoDetalleActivity extends AppCompatActivity {
                 for (DataSnapshot child : snapshot.getChildren()) {
                     Cultivo c = child.getValue(Cultivo.class);
                     if (c != null) {
-                        c.id = child.getKey();
+                        c.setId(child.getKey());
                         cultivos.add(c);
                     }
                 }
@@ -161,7 +251,8 @@ public class HuertoDetalleActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(HuertoDetalleActivity.this,
-                        "Error al cargar cultivos", Toast.LENGTH_SHORT).show();
+                        "Error al cargar cultivos: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
             }
         };
 
@@ -176,7 +267,7 @@ public class HuertoDetalleActivity extends AppCompatActivity {
                 .setTitle("¿Eliminar cultivo?")
                 .setMessage("¿Seguro que quieres eliminar este cultivo?\nEsta acción no se puede deshacer.")
                 .setPositiveButton("Eliminar", (d, w) ->
-                        cultivoDAO.removeCultivo(huertoId, cultivo.id, new CultivoDAO.OnCompleteCallback() {
+                        cultivoDAO.removeCultivo(huertoId, cultivo.getId(), new CultivoDAO.OnCompleteCallback() {
                             @Override
                             public void onSuccess() {
                                 Toast.makeText(HuertoDetalleActivity.this,
@@ -207,6 +298,15 @@ public class HuertoDetalleActivity extends AppCompatActivity {
         super.onDestroy();
         if (cultivoListener != null) {
             cultivoDAO.removeListener(huertoId, cultivoListener);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Recargar huerto por si fue editado
+        if (huertoId != null) {
+            cargarHuerto();
         }
     }
 }

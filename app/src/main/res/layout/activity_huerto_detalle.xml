@@ -17,7 +17,7 @@
             android:layout_height="64dp"
             android:background="#2E7D32"
             android:paddingStart="8dp"
-            android:paddingEnd="16dp"
+            android:paddingEnd="8dp"
             android:gravity="center_vertical"
             android:elevation="4dp">
 
@@ -39,6 +39,16 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_marginStart="4dp" />
+
+            <ImageButton
+                android:id="@+id/btnEditarHuerto"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_edit"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                app:tint="#FFFFFF"
+                android:contentDescription="Editar huerto" />
 
         </LinearLayout>
 
@@ -80,7 +90,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="📋 Descripción del huerto"
+                            android:text="📋 Descripción"
                             android:textColor="#A5D6A7"
                             android:textSize="15sp"
                             android:textStyle="bold"
@@ -91,6 +101,166 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textColor="#CCCCCC"
+                            android:textSize="14sp"
+                            android:lineSpacingExtra="4dp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- CARD INFORMACIÓN DEL HUERTO -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardInfoHuerto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginBottom="14dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#263226">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ℹ️ Información del huerto"
+                            android:textColor="#A5D6A7"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="12dp" />
+
+                        <!-- Ubicación -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/txtUbicacion"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="📍 Ubicación"
+                                android:textColor="#CCCCCC"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <!-- Superficie -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/txtSuperficie"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="📏 Superficie"
+                                android:textColor="#CCCCCC"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <!-- Tipo de suelo -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/txtTipoSuelo"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="🌱 Tipo de suelo"
+                                android:textColor="#CCCCCC"
+                                android:textSize="14dp" />
+                        </LinearLayout>
+
+                        <!-- Horas de sol -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/txtHorasSol"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="☀️ Horas de sol"
+                                android:textColor="#CCCCCC"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <!-- Riego -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:id="@+id/txtRiego"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="💧 Riego"
+                                android:textColor="#CCCCCC"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- CARD NOTAS (visible solo si hay notas) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardNotas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginBottom="14dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#3E5035"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📝 Notas"
+                            android:textColor="#C5E1A5"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:id="@+id/txtNotas"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="#E8F5E9"
                             android:textSize="14sp"
                             android:lineSpacingExtra="4dp" />
 

@@ -7,6 +7,7 @@
     android:layout_marginBottom="10dp"
     app:cardCornerRadius="12dp"
     app:cardElevation="3dp"
+    app:cardBackgroundColor="#FFFFFF"
     app:strokeColor="#C8E6C9"
     app:strokeWidth="1dp">
 
@@ -14,36 +15,120 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
         android:padding="12dp">
 
         <!-- IMAGEN -->
         <ImageView
             android:id="@+id/imgPlanta"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:scaleType="centerCrop"
             android:background="#E8F5E9"
-            android:padding="4dp" />
+            android:padding="6dp" />
 
-        <!-- NOMBRE -->
-        <TextView
-            android:id="@+id/txtNombre"
+        <!-- CONTENIDO -->
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="14dp"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:textColor="#1B5E20" />
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <!-- NOMBRE -->
+            <TextView
+                android:id="@+id/txtNombre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lechuga"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1B5E20" />
+
+            <!-- NOMBRE CIENTÍFICO -->
+            <TextView
+                android:id="@+id/txtNombreCientifico"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lactuca sativa"
+                android:textSize="12sp"
+                android:textStyle="italic"
+                android:textColor="#66BB6A"
+                android:layout_marginTop="2dp"
+                android:visibility="gone" />
+
+            <!-- TIPO -->
+            <TextView
+                android:id="@+id/txtTipoPlanta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hortaliza"
+                android:textSize="11sp"
+                android:textColor="#999999"
+                android:layout_marginTop="2dp" />
+
+            <!-- INFO RÁPIDA (grid 2 columnas) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="6dp">
+
+                <!-- Columna 1 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Tiempo crecimiento -->
+                    <TextView
+                        android:id="@+id/txtTiempoPlanta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⏱ 60 días"
+                        android:textSize="11sp"
+                        android:textColor="#666666" />
+
+                    <!-- Riego -->
+                    <TextView
+                        android:id="@+id/txtRiegoPlanta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="💧 alto"
+                        android:textSize="11sp"
+                        android:textColor="#666666"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <!-- Columna 2 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Luz -->
+                    <TextView
+                        android:id="@+id/txtLuzPlanta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="☀️ pleno-sol"
+                        android:textSize="11sp"
+                        android:textColor="#666666" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <!-- FLECHA -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="›"
-            android:textSize="24sp"
+            android:textSize="28sp"
             android:textColor="#A5D6A7"
+            android:layout_gravity="center_vertical"
             android:layout_marginStart="8dp" />
 
     </LinearLayout>

@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.proyectofinal.R;
@@ -36,11 +37,11 @@ public class LoginActivity extends AppCompatActivity {
 
         authDAO = new AuthDAO();
 
-        emailInput        = findViewById(R.id.emailInput);
-        passwordInput     = findViewById(R.id.passwordInput);
-        loginButton       = findViewById(R.id.loginButton);
-        goToRegisterButton= findViewById(R.id.goToRegisterButton);
-        btnGoogle         = findViewById(R.id.btnGoogle);
+        emailInput = findViewById(R.id.emailInput);
+        passwordInput = findViewById(R.id.passwordInput);
+        loginButton = findViewById(R.id.loginButton);
+        goToRegisterButton = findViewById(R.id.goToRegisterButton);
+        btnGoogle = findViewById(R.id.btnGoogle);
 
         // Configuración Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -59,21 +60,33 @@ public class LoginActivity extends AppCompatActivity {
                                 GoogleSignIn.getSignedInAccountFromIntent(result.getData());
                         try {
                             GoogleSignInAccount account = task.getResult(ApiException.class);
-                            // Delegar completamente al DAO
-                            authDAO.loginWithGoogle(account.getIdToken(), null, new AuthDAO.OnAuthResult() {
+
+                            // Login con Google usando nuevo callback OnLoginResult
+                            authDAO.loginWithGoogle(account.getIdToken(), new AuthDAO.OnLoginResult() {
                                 @Override
                                 public void onSuccess(FirebaseUser user) {
-                                    Toast.makeText(LoginActivity.this, "Login con Google correcto", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(LoginActivity.this,
+                                            "Login con Google correcto",
+                                            Toast.LENGTH_SHORT).show();
                                     irAlContenedor();
                                 }
 
                                 @Override
+                                public void onBanned(String motivo) {
+                                    mostrarDialogoBaneado(motivo);
+                                }
+
+                                @Override
                                 public void onError(Exception e) {
-                                    Toast.makeText(LoginActivity.this, "Error autenticando con Google", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(LoginActivity.this,
+                                            "Error autenticando con Google: " + e.getMessage(),
+                                            Toast.LENGTH_LONG).show();
                                 }
                             });
                         } catch (ApiException e) {
-                            Toast.makeText(this, "Error en login Google", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this,
+                                    "Error en login Google: " + e.getMessage(),
+                                    Toast.LENGTH_LONG).show();
                         }
                     }
                 }
@@ -103,10 +116,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // ---------------------------------------------------------
-    // Login con email/contraseña — solo UI y delegación al DAO
+    // Login con email/contraseña — usa OnLoginResult con verificación baneo
     // ---------------------------------------------------------
     private void loginUsuario() {
-        String email    = emailInput.getText().toString().trim();
+        String email = emailInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
 
         if (email.isEmpty() || password.isEmpty()) {
@@ -114,18 +127,52 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        authDAO.login(email, password, new AuthDAO.OnAuthResult() {
+        authDAO.login(email, password, new AuthDAO.OnLoginResult() {
             @Override
             public void onSuccess(FirebaseUser user) {
-                Toast.makeText(LoginActivity.this, "Inicio de sesión correcto", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this,
+                        "Inicio de sesión correcto",
+                        Toast.LENGTH_SHORT).show();
                 irAlContenedor();
             }
 
             @Override
+            public void onBanned(String motivo) {
+                mostrarDialogoBaneado(motivo);
+            }
+
+            @Override
             public void onError(Exception e) {
-                Toast.makeText(LoginActivity.this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show();
+                String mensaje = e.getMessage();
+
+                // Mensajes más amigables
+                if (mensaje != null) {
+                    if (mensaje.contains("password is invalid") || mensaje.contains("INVALID_LOGIN_CREDENTIALS")) {
+                        mensaje = "Contraseña incorrecta";
+                    } else if (mensaje.contains("no user record") || mensaje.contains("EMAIL_NOT_FOUND")) {
+                        mensaje = "Usuario no encontrado";
+                    } else if (mensaje.contains("network error")) {
+                        mensaje = "Error de conexión. Verifica tu internet.";
+                    }
+                }
+
+                Toast.makeText(LoginActivity.this,
+                        "Error: " + mensaje,
+                        Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    // ---------------------------------------------------------
+    // Mostrar diálogo cuando usuario está baneado
+    // ---------------------------------------------------------
+    private void mostrarDialogoBaneado(String motivo) {
+        new AlertDialog.Builder(this)
+                .setTitle("Cuenta Suspendida")
+                .setMessage("Tu cuenta ha sido suspendida y no puedes acceder.\n\nMotivo: " + motivo)
+                .setPositiveButton("Entendido", null)
+                .setCancelable(false)
+                .show();
     }
 
     // ---------------------------------------------------------

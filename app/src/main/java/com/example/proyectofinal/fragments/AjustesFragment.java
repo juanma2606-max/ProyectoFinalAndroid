@@ -21,8 +21,8 @@ import com.example.proyectofinal.MusicService;
 import com.example.proyectofinal.R;
 import com.example.proyectofinal.activities.LoginActivity;
 import com.example.proyectofinal.dao.AuthDAO;
-import com.example.proyectofinal.dao.PersonDAO;
-import com.example.proyectofinal.modelos.Person;
+import com.example.proyectofinal.dao.UserDAO;
+import com.example.proyectofinal.modelos.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -34,7 +34,7 @@ public class AjustesFragment extends Fragment {
     private SharedPreferences prefs;
     private static final String PREFS_NAME = "app_settings";
 
-    private PersonDAO personDAO;
+    private UserDAO personDAO;
     private AuthDAO authDAO;
 
     @Nullable
@@ -44,7 +44,7 @@ public class AjustesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_ajustes, container, false);
 
         prefs     = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        personDAO = new PersonDAO();
+        personDAO = new UserDAO();
         authDAO   = new AuthDAO();
 
         txtNombre   = view.findViewById(R.id.txtUsuarioNombre);
@@ -86,7 +86,7 @@ public class AjustesFragment extends Fragment {
         personDAO.getPersonById(uid, new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Person person = snapshot.getValue(Person.class);
+                User person = snapshot.getValue(User.class);
                 if (person == null) return;
                 txtNombre.setText(person.username != null ? person.username : "Sin nombre");
                 txtEmail.setText(person.email != null ? person.email : "Sin email");
