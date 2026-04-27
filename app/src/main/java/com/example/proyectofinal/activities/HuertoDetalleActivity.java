@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,6 +20,7 @@ import com.example.proyectofinal.R;
 import com.example.proyectofinal.adaptadores.CultivoAdapter;
 import com.example.proyectofinal.dao.CultivoDAO;
 import com.example.proyectofinal.dao.HuertoDAO;
+import com.example.proyectofinal.dialogs.DialogAnalisisHuerto;
 import com.example.proyectofinal.modelos.Cultivo;
 import com.example.proyectofinal.modelos.Huerto;
 import com.google.android.material.card.MaterialCardView;
@@ -54,6 +56,8 @@ public class HuertoDetalleActivity extends AppCompatActivity {
 
     private String huertoId;
     private Huerto huertoActual;
+
+    private Button btnAnalizarHuerto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +102,9 @@ public class HuertoDetalleActivity extends AppCompatActivity {
         // RecyclerView cultivos
         recyclerCultivos = findViewById(R.id.recyclerCultivos);
         emptyStateCultivos = findViewById(R.id.emptyStateCultivos);
+
+        // Botón de ia
+        btnAnalizarHuerto = findViewById(R.id.btnAnalizarHuerto);
 
         recyclerCultivos.setLayoutManager(new LinearLayoutManager(this));
         cultivoAdapter = new CultivoAdapter(this, cultivos, new CultivoAdapter.OnCultivoActionListener() {
@@ -145,6 +152,8 @@ public class HuertoDetalleActivity extends AppCompatActivity {
                 startActivity(i);
             });
         }
+
+        btnAnalizarHuerto.setOnClickListener(v -> analizarHuertoConIA());
 
         // Recibir el ID del huerto
         huertoId = getIntent().getStringExtra("huertoId");
@@ -361,5 +370,105 @@ public class HuertoDetalleActivity extends AppCompatActivity {
         if (huertoId != null) {
             cargarHuerto();
         }
+    }
+
+    private void analizarHuertoConIA() {
+        StringBuilder prompt = new StringBuilder();
+
+        // INSTRUCCIONES CLARAS PRIMERO
+        prompt.append("INSTRUCCIONES: Analiza mi huerto respondiendo en este formato:\n");
+        prompt.append("1. ANÁLISIS INDIVIDUAL de cada cultivo (uno por uno)\n");
+        prompt.append("2. ANÁLISIS GENERAL del huerto completo\n\n");
+        prompt.append("═══════════════════════════════════\n\n");
+
+        // DATOS HUERTO
+        prompt.append("📋 MI HUERTO:\n");
+        prompt.append("🌱 Nombre: ").append(huertoActual.getNombre()).append("\n");
+        prompt.append("📍 Ubicación: ").append(huertoActual.getUbicacion()).append("\n");
+        prompt.append("📏 Superficie: ").append(huertoActual.getSuperficie()).append(" m²\n");
+        prompt.append("🌾 Tipo suelo: ").append(huertoActual.getTipo_suelo()).append("\n");
+        prompt.append("☀️ Horas sol: ").append(huertoActual.getHoras_sol()).append(" h/día\n");
+        prompt.append("💧 Riego: ").append(huertoActual.getTiene_riego() ? "Sí" : "No").append("\n");
+
+        if (huertoActual.getNotas() != null && !huertoActual.getNotas().isEmpty()) {
+            prompt.append("📝 Notas: ").append(huertoActual.getNotas()).append("\n");
+        }
+
+        // CULTIVOS CON NOMBRE
+        if (!cultivos.isEmpty()) {
+            prompt.append("\n🌿 CULTIVOS (").append(cultivos.size()).append("):\n\n");
+
+            for (int i = 0; i < cultivos.size(); i++) {
+                Cultivo c = cultivos.get(i);
+
+                prompt.append("Cultivo ").append(i + 1).append(":\n");
+                prompt.append("  • Nombre: ").append(c.getNombre() != null ? c.getNombre() : "Sin nombre").append("\n");
+                prompt.append("  • Cantidad: ").append(c.getCantidad()).append(" planta");
+                if (c.getCantidad() > 1) prompt.append("s");
+                prompt.append("\n");
+                prompt.append("  • Estado: ").append(c.getEstado());
+
+                if (c.estaEnfermo()) {
+                    prompt.append(" ⚠️ ENFERMO");
+                    if (c.getAmenazaId() != null) {
+                        prompt.append(" (amenaza ").append(c.getAmenazaId()).append(")");
+                    }
+                }
+                prompt.append("\n");
+
+                if (c.getFechaSiembra() != null) {
+                    prompt.append("  • Fecha siembra: ").append(c.getFechaSiembra()).append("\n");
+                }
+
+                if (c.getNotas() != null && !c.getNotas().isEmpty()) {
+                    prompt.append("  • Notas: ").append(c.getNotas()).append("\n");
+                }
+
+                prompt.append("\n");
+            }
+        }
+
+        // QUÉ QUIERO EN LA RESPUESTA
+        prompt.append("═══════════════════════════════════\n");
+        prompt.append("📝 RESPONDE ASÍ:\n");
+        prompt.append("═══════════════════════════════════\n\n");
+
+        if (!cultivos.isEmpty()) {
+            prompt.append("🔍 PARTE 1 - ANÁLISIS INDIVIDUAL:\n");
+            prompt.append("Analiza CADA cultivo separadamente:\n\n");
+
+            for (Cultivo c : cultivos) {
+                String nombre = c.getNombre() != null ? c.getNombre() : "Sin nombre";
+                prompt.append("**").append(nombre).append(":**\n");
+
+                if (c.estaEnfermo()) {
+                    prompt.append("- Diagnóstico: ¿qué tiene?\n");
+                    prompt.append("- Causas probables\n");
+                    prompt.append("- Tratamiento recomendado\n");
+                    prompt.append("- ¿Salvar o arrancar?\n");
+                } else {
+                    prompt.append("- Estado actual\n");
+                    prompt.append("- Cuidados necesarios ahora\n");
+                    prompt.append("- Cuándo cosechar\n");
+                    prompt.append("- Consejos extra\n");
+                }
+                prompt.append("\n");
+            }
+
+            prompt.append("🌍 PARTE 2 - ANÁLISIS GENERAL:\n");
+            prompt.append("- Compatibilidad entre cultivos\n");
+            prompt.append("- Nuevos cultivos recomendados\n");
+            prompt.append("- Optimización espacio\n");
+            prompt.append("- Calendario siembra próximas semanas\n");
+
+        } else {
+            prompt.append("Como NO tengo cultivos, dame:\n");
+            prompt.append("- Qué plantar según suelo y sol\n");
+            prompt.append("- Calendario siembra inicial\n");
+        }
+
+        // Mostrar dialog
+        DialogAnalisisHuerto dialog = new DialogAnalisisHuerto(this, prompt.toString());
+        dialog.show();
     }
 }

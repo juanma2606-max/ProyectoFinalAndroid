@@ -28,6 +28,7 @@
                 android:src="@android:drawable/ic_menu_revert"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="8dp"
+                android:contentDescription="@string/volver"
                 app:tint="#FFFFFF" />
 
             <TextView
@@ -70,7 +71,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:scaleType="centerCrop"
-                    android:background="#1B3A1B" />
+                    android:background="#1B3A1B"
+                    android:contentDescription="@string/imagen_huerto" />
 
                 <!-- CARD DESCRIPCIÓN - COLAPSABLE -->
                 <com.google.android.material.card.MaterialCardView
@@ -102,7 +104,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="📋 Descripción"
+                                android:text="@string/descripcion_huerto"
                                 android:textColor="#A5D6A7"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
@@ -112,6 +114,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:src="@android:drawable/arrow_down_float"
+                                android:contentDescription="Expandir descripción"
                                 app:tint="#A5D6A7" />
 
                         </LinearLayout>
@@ -184,6 +187,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:src="@android:drawable/arrow_down_float"
+                                android:contentDescription="Expandir información"
                                 app:tint="#A5D6A7" />
 
                         </LinearLayout>
@@ -298,6 +302,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:src="@android:drawable/arrow_down_float"
+                                android:contentDescription="Expandir notas"
                                 app:tint="#C5E1A5" />
 
                         </LinearLayout>
@@ -342,7 +347,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="🌿 Mis plantaciones"
+                        android:text="@string/mis_plantaciones"
                         android:textColor="#FFFFFF"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -369,7 +374,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Aún no tienes plantaciones"
+                        android:text="@string/sin_plantaciones"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -378,7 +383,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Pulsa el botón + para añadir tu primera planta"
+                        android:text="@string/instrucciones_agregar_planta"
                         android:textColor="#A5D6A7"
                         android:textSize="13sp"
                         android:gravity="center" />
@@ -411,6 +416,20 @@
         android:contentDescription="Agregar cultivo"
         app:backgroundTint="#2E7D32"
         app:tint="#FFFFFF"
+        app:elevation="6dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAnalizarHuerto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="20dp"
+        android:text="Analizar con IA"
+        android:backgroundTint="#FF9800"
+        app:icon="@android:drawable/ic_menu_search"
+        app:cornerRadius="24dp"
+        android:textColor="#FFFFFF"
+        app:iconTint="#FFFFFF"
         app:elevation="6dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

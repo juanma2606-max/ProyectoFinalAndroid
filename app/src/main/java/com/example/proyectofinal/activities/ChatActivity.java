@@ -51,7 +51,53 @@ public class ChatActivity extends AppCompatActivity {
         ));
         adapter.notifyItemInserted(0);
 
+        // Detectar si viene mensaje inicial desde análisis de huerto
+        String mensajeInicial = getIntent().getStringExtra("mensaje_inicial");
+        if (mensajeInicial != null && !mensajeInicial.isEmpty()) {
+            // Agregar como mensaje del USUARIO para que IA responda
+            mensajes.add(new Mensaje("user", "Tengo este análisis de mi huerto:\n\n" + mensajeInicial + "\n\n¿Qué más me recomiendas?"));
+            adapter.notifyItemInserted(mensajes.size() - 1);
+            scrollAlFinal();
+
+            // Enviar automáticamente para que IA responda
+            enviarMensajeInicial();
+        }
+
         btnEnviar.setOnClickListener(v -> enviarMensaje());
+    }
+
+    /**
+     * Enviar mensaje inicial del análisis para que IA responda
+     */
+    private void enviarMensajeInicial() {
+        enviando = true;
+        btnEnviar.setEnabled(false);
+        btnEnviar.setText("...");
+
+        chatDAO.enviarMensaje(mensajes, new ChatDAO.OnChatResponseListener() {
+            @Override
+            public void onSuccess(String response) {
+                Mensaje mensajeIA = new Mensaje("assistant", response);
+                mensajes.add(mensajeIA);
+                adapter.notifyItemInserted(mensajes.size() - 1);
+                scrollAlFinal();
+
+                enviando = false;
+                btnEnviar.setEnabled(true);
+                btnEnviar.setText("▶");
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(ChatActivity.this,
+                        "Error: " + message,
+                        Toast.LENGTH_SHORT).show();
+
+                enviando = false;
+                btnEnviar.setEnabled(true);
+                btnEnviar.setText("▶");
+            }
+        });
     }
 
     private void initViews() {

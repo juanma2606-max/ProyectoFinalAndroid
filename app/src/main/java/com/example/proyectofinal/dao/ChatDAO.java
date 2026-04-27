@@ -4,6 +4,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.example.proyectofinal.modelos.Mensaje;
 
 import org.json.JSONArray;
@@ -13,13 +15,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.Call;
-import okhttp3.Callback;
+import okhttp3.ResponseBody;
 
 public class ChatDAO {
 
@@ -81,27 +84,27 @@ public class ChatDAO {
             // Ejecutar async
             client.newCall(request).enqueue(new Callback() {
                 @Override
-                public void onFailure(Call call, IOException e) {
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     Log.e(TAG, "❌ Error de red: " + e.getMessage());
                     notifyError(listener, "Error de conexión: " + e.getMessage());
                 }
 
                 @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    if (!response.isSuccessful()) {
-                        String errorBody = response.body() != null ? response.body().string() : "Sin detalle";
-                        Log.e(TAG, "❌ Error HTTP " + response.code() + ": " + errorBody);
-                        notifyError(listener, "Error del servidor");
-                        return;
-                    }
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    try (ResponseBody responseBodyObj = response.body()) {
+                        if (!response.isSuccessful()) {
+                            String errorBody = responseBodyObj != null ? responseBodyObj.string() : "Sin detalle";
+                            Log.e(TAG, "❌ Error HTTP " + response.code() + ": " + errorBody);
+                            notifyError(listener, "Error del servidor");
+                            return;
+                        }
 
-                    if (response.body() == null) {
-                        notifyError(listener, "Respuesta vacía del servidor");
-                        return;
-                    }
+                        if (responseBodyObj == null) {
+                            notifyError(listener, "Respuesta vacía");
+                            return;
+                        }
 
-                    try {
-                        String responseBody = response.body().string();
+                        String responseBody = responseBodyObj.string();
                         Log.d(TAG, "✅ Respuesta recibida: " + responseBody);
 
                         JSONObject jsonResponse = new JSONObject(responseBody);
@@ -134,5 +137,69 @@ public class ChatDAO {
      */
     private void notifyError(OnChatResponseListener listener, String message) {
         mainHandler.post(() -> listener.onError(message));
+    }
+
+    /**
+     * Analizar huerto específico con contexto del usuario
+     */
+    public void analizarHuerto(String prompt, OnChatResponseListener listener) {
+
+        if (prompt == null || prompt.trim().isEmpty()) {
+            notifyError(listener, "Prompt vacío");
+            return;
+        }
+
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("prompt", prompt);
+
+            Log.d(TAG, "🌱 Analizando huerto...");
+
+            RequestBody body = RequestBody.create(JSON, payload.toString());
+            Request request = new Request.Builder()
+                    .url("https://huerting-backend.onrender.com/api/analizar-huerto")
+                    .post(body)
+                    .addHeader("Content-Type", "application/json")
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                    Log.e(TAG, "❌ Error análisis: " + e.getMessage());
+                    notifyError(listener, "Error de conexión");
+                }
+
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    try (ResponseBody responseBodyObj = response.body()) {
+                        if (!response.isSuccessful()) {
+                            Log.e(TAG, "❌ Error HTTP " + response.code());
+                            notifyError(listener, "Error del servidor");
+                            return;
+                        }
+
+                        if (responseBodyObj == null) {
+                            notifyError(listener, "Respuesta vacía");
+                            return;
+                        }
+
+                        String responseBody = responseBodyObj.string();
+                        JSONObject jsonResponse = new JSONObject(responseBody);
+                        String analisis = jsonResponse.getString("analisis");
+
+                        Log.d(TAG, "✅ Análisis completado");
+                        notifySuccess(listener, analisis);
+
+                    } catch (Exception e) {
+                        Log.e(TAG, "❌ Error parseando: " + e.getMessage());
+                        notifyError(listener, "Error procesando análisis");
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error construyendo request: " + e.getMessage());
+            notifyError(listener, "Error preparando análisis");
+        }
     }
 }
