@@ -8,239 +8,400 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="20dp"
-        android:paddingTop="40dp"
         android:orientation="vertical">
 
-        <!-- BOTÓN VOLVER -->
+        <!-- HEADER DECORATIVO -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
-
-            <ImageButton
-                android:id="@+id/btnVolver"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:src="@android:drawable/ic_menu_revert"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="6dp"
-                app:tint="#A5D6A7"
-                android:contentDescription="Volver" />
+            android:layout_height="180dp"
+            android:background="#2E4A2E"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="6dp"
-                android:text="Volver"
+                android:text="🌿"
+                android:textSize="72sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Crear huerto"
                 android:textColor="#A5D6A7"
-                android:textSize="15sp" />
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Crea tu espacio verde personal"
+                android:textColor="#81C784"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:layout_marginTop="4dp" />
 
         </LinearLayout>
 
-        <!-- CARD PRINCIPAL -->
-        <androidx.cardview.widget.CardView
+        <!-- FORMULARIO -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="10dp">
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:background="#F8F9FA">
+
+            <!-- BOTÓN VOLVER -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageButton
+                    android:id="@+id/btnVolver"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:src="@android:drawable/ic_menu_revert"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="6dp"
+                    android:contentDescription="Volver" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="6dp"
+                    android:text="Volver"
+                    android:textColor="#666666"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+            <!-- SELECTOR DE FOTOS -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Foto del huerto"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Selecciona una imagen para tu huerto"
+                android:textColor="#666666"
+                android:textSize="12sp"
+                android:layout_marginBottom="12dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="20dp">
 
-                <!-- COLUMNA IZQUIERDA — imagen decorativa -->
-                <LinearLayout
+                <!-- FOTO 1 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardFoto1"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:background="#2E4A2E"
-                    android:orientation="vertical"
-                    android:padding="24dp">
+                    android:layout_height="100dp"
+                    android:layout_margin="4dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🌿"
-                        android:textSize="72sp" />
+                    <ImageView
+                        android:id="@+id/imgFoto1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Nuevo\nHuerto"
-                        android:textColor="#A5D6A7"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:layout_marginTop="12dp" />
+                </androidx.cardview.widget.CardView>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Crea tu espacio\nverde personal"
-                        android:textColor="#81C784"
-                        android:textSize="12sp"
-                        android:gravity="center"
-                        android:layout_marginTop="8dp" />
-
-                </LinearLayout>
-
-                <!-- COLUMNA DERECHA — formulario -->
-                <LinearLayout
+                <!-- FOTO 2 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardFoto2"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:padding="24dp"
-                    android:background="#F8F9FA">
+                    android:layout_height="100dp"
+                    android:layout_margin="4dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
+                    <ImageView
+                        android:id="@+id/imgFoto2"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Crear huerto"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="#2E7D32"
-                        android:gravity="center"
-                        android:paddingBottom="4dp" />
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop" />
 
-                    <TextView
+                </androidx.cardview.widget.CardView>
+
+                <!-- FOTO 3 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardFoto3"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="100dp"
+                    android:layout_margin="4dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:id="@+id/imgFoto3"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Completa los campos para continuar"
-                        android:textColor="#777777"
-                        android:textSize="12sp"
-                        android:gravity="center"
-                        android:paddingBottom="20dp" />
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop" />
 
-                    <!-- NOMBRE -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Nombre"
-                        android:textStyle="bold"
-                        android:textColor="#333333"
-                        android:layout_marginBottom="4dp" />
+                </androidx.cardview.widget.CardView>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="14dp"
-                        app:boxStrokeColor="#2E7D32"
-                        app:hintTextColor="#2E7D32"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etNombreHuerto"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Mi huerto"
-                            android:inputType="textCapSentences"
-                            android:maxLines="1" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- DESCRIPCIÓN -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Descripción"
-                        android:textStyle="bold"
-                        android:textColor="#333333"
-                        android:layout_marginBottom="4dp" />
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="18dp"
-                        app:boxStrokeColor="#2E7D32"
-                        app:hintTextColor="#2E7D32"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etDescripcionHuerto"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Opcional"
-                            android:inputType="textMultiLine"
-                            android:minLines="2"
-                            android:maxLines="3"
-                            android:gravity="top" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- TIPO -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tipo de huerto"
-                        android:textStyle="bold"
-                        android:textColor="#333333"
-                        android:layout_marginBottom="8dp" />
-
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/chipGroupTipo"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:singleSelection="true"
-                        app:selectionRequired="true"
-                        android:layout_marginBottom="24dp">
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chipParcela"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🌱 Parcela"
-                            android:checked="true"
-                            app:chipBackgroundColor="#E8F5E9"
-                            app:chipStrokeColor="#2E7D32"
-                            app:chipStrokeWidth="1dp"
-                            style="@style/Widget.MaterialComponents.Chip.Choice" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chipMaceta"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🪴 Maceta"
-                            app:chipBackgroundColor="#E8F5E9"
-                            app:chipStrokeColor="#2E7D32"
-                            app:chipStrokeWidth="1dp"
-                            style="@style/Widget.MaterialComponents.Chip.Choice" />
-
-                    </com.google.android.material.chip.ChipGroup>
-
-                    <!-- BOTÓN GUARDAR -->
-                    <Button
-                        android:id="@+id/btnGuardar"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:text="Crear huerto"
-                        android:textStyle="bold"
-                        android:textColor="#FFFFFF"
-                        android:backgroundTint="#2E7D32"
-                        android:layout_marginBottom="10dp" />
-
-                    <!-- BOTÓN CANCELAR -->
-                    <Button
-                        android:id="@+id/btnCancelar"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:text="Cancelar"
-                        android:textStyle="bold"
-                        android:textColor="#2E7D32"
-                        android:backgroundTint="@android:color/transparent"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        app:strokeColor="#2E7D32"
-                        app:strokeWidth="1dp" />
-
-                </LinearLayout>
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+
+            <!-- NOMBRE -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nombre"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:layout_marginBottom="4dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#2E7D32"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNombreHuerto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Mi huerto urbano"
+                    android:inputType="textCapSentences"
+                    android:maxLines="1" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- DESCRIPCIÓN -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Descripción"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:layout_marginBottom="4dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#2E7D32"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDescripcionHuerto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Descripción opcional"
+                    android:inputType="textMultiLine"
+                    android:minLines="2"
+                    android:maxLines="3"
+                    android:gravity="top" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- UBICACIÓN -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ubicación"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:layout_marginBottom="4dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#2E7D32"
+                app:startIconDrawable="@android:drawable/ic_menu_mylocation"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etUbicacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ej: Sevilla, terraza del piso"
+                    android:inputType="text" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- SUPERFICIE -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Superficie (m²)"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:layout_marginBottom="4dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#2E7D32"
+                app:suffixText="m²"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etSuperficie"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="10.0"
+                    android:inputType="numberDecimal" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- TIPO SUELO -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tipo de suelo"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:layout_marginBottom="8dp" />
+
+            <Spinner
+                android:id="@+id/spinnerTipoSuelo"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:background="@android:drawable/editbox_background"
+                android:layout_marginBottom="16dp" />
+
+            <!-- HORAS SOL -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Horas de sol diarias"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:layout_marginBottom="4dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#2E7D32"
+                app:suffixText="horas/día"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etHorasSol"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="6"
+                    android:inputType="number" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- TIENE RIEGO -->
+            <CheckBox
+                android:id="@+id/cbTieneRiego"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="¿Tiene sistema de riego?"
+                android:textColor="#333333"
+                android:textSize="14sp"
+                android:buttonTint="#2E7D32"
+                android:layout_marginBottom="16dp" />
+
+            <!-- NOTAS -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notas"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:layout_marginBottom="4dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#2E7D32"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNotas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Notas adicionales (opcional)"
+                    android:inputType="textMultiLine"
+                    android:minLines="3"
+                    android:maxLines="5"
+                    android:gravity="top" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- BOTÓN GUARDAR -->
+            <Button
+                android:id="@+id/btnGuardar"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Crear huerto"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:backgroundTint="#2E7D32"
+                android:layout_marginBottom="12dp" />
+
+            <!-- BOTÓN CANCELAR -->
+            <Button
+                android:id="@+id/btnCancelar"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Cancelar"
+                android:textStyle="bold"
+                android:textColor="#2E7D32"
+                android:textSize="16sp"
+                android:backgroundTint="@android:color/transparent"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                app:strokeColor="#2E7D32"
+                app:strokeWidth="2dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

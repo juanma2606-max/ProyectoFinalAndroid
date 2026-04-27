@@ -27,6 +27,13 @@ public class AuthDAO {
     }
 
     // ---------------------------------------------------------
+    // Referencia al perfil del usuario
+    // ---------------------------------------------------------
+    private DatabaseReference getProfileRef(String uid) {
+        return usersRef.child(uid).child("profile");
+    }
+
+    // ---------------------------------------------------------
     // INTERFACES
     // ---------------------------------------------------------
     public interface OnAuthResult {
@@ -53,9 +60,9 @@ public class AuthDAO {
                 .addOnSuccessListener(result -> {
                     FirebaseUser firebaseUser = result.getUser();
                     if (firebaseUser != null) {
-                        // Crear usuario en database
+                        // Crear usuario en database en /users/{uid}/profile
                         User user = new User(firebaseUser.getUid(), username, email);
-                        usersRef.child(firebaseUser.getUid()).setValue(user)
+                        getProfileRef(firebaseUser.getUid()).setValue(user)
                                 .addOnSuccessListener(aVoid -> callback.onSuccess(firebaseUser))
                                 .addOnFailureListener(callback::onError);
                     } else {
@@ -154,11 +161,11 @@ public class AuthDAO {
     // Verificar si usuario está baneado
     // ---------------------------------------------------------
     private void checkIfBanned(String uid, OnBanCheckCallback callback) {
-        usersRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+        getProfileRef(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                if (user != null && user.isBaneado()) {
+                if (user != null && user.estaBaneado()) {
                     callback.onBanned(true, user.getMotivoBaneo());
                 } else {
                     callback.onBanned(false, null);
@@ -184,7 +191,8 @@ public class AuthDAO {
                 firebaseUser.getEmail()
         );
 
-        usersRef.child(firebaseUser.getUid()).setValue(user);
+        // Guardar en /users/{uid}/profile
+        getProfileRef(firebaseUser.getUid()).setValue(user);
     }
 
     // ---------------------------------------------------------

@@ -4,9 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    app:cardCornerRadius="14dp"
-    app:cardElevation="4dp"
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
     app:cardBackgroundColor="#FFFFFF"
     app:strokeColor="#C8E6C9"
     app:strokeWidth="1dp">
@@ -19,254 +19,83 @@
         <!-- IMAGEN DE LA PLANTA -->
         <ImageView
             android:id="@+id/imgCultivo"
-            android:layout_width="110dp"
-            android:layout_height="match_parent"
+            android:layout_width="90dp"
+            android:layout_height="120dp"
             android:scaleType="centerCrop"
             android:background="#E8F5E9"
-            android:padding="8dp" />
+            android:padding="6dp" />
 
         <!-- CONTENIDO DERECHO -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="10dp">
 
-            <!-- HEADER: Nombre cultivo + warning -->
+            <!-- NOMBRE PLANTA -->
+            <TextView
+                android:id="@+id/txtNombrePlanta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Calabaza"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1B5E20"
+                android:layout_marginBottom="4dp" />
+
+            <!-- CANTIDAD Y FECHA -->
+            <TextView
+                android:id="@+id/txtCantidadCultivo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4 plantas"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="2dp" />
+
+            <TextView
+                android:id="@+id/txtFechaSiembra"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sembrado: 26/04/2026"
+                android:textSize="11sp"
+                android:textColor="#999999"
+                android:layout_marginBottom="6dp" />
+
+            <!-- ESTADO -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:padding="12dp"
-                android:paddingBottom="6dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <!-- Nombre personalizado cultivo -->
-                    <TextView
-                        android:id="@+id/txtNombreCultivo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Mi cultivo"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:textColor="#1B5E20"
-                        android:visibility="gone" />
-
-                    <!-- Cantidad y fecha -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="2dp">
-
-                        <TextView
-                            android:id="@+id/txtCantidadCultivo"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="5 plantas"
-                            android:textSize="11sp"
-                            android:textColor="#666666" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text=" • "
-                            android:textSize="11sp"
-                            android:textColor="#666666" />
-
-                        <TextView
-                            android:id="@+id/txtFechaSiembra"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Sembrado: 24/04/2026"
-                            android:textSize="11sp"
-                            android:textColor="#666666" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- Warning icon si enfermo -->
-                <ImageView
-                    android:id="@+id/iconWarning"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_dialog_alert"
-                    android:tint="#FFC107"
-                    android:visibility="gone" />
-
-            </LinearLayout>
-
-            <!-- DATOS DE LA PLANTA -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="8dp">
+                android:layout_marginBottom="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Necesidades de la planta"
+                    android:text="Estado: "
                     android:textSize="12sp"
+                    android:textColor="#666666" />
+
+                <TextView
+                    android:id="@+id/txtEstadoCultivo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Creciendo"
                     android:textStyle="bold"
-                    android:textColor="#1B5E20"
-                    android:layout_marginBottom="6dp" />
+                    android:textSize="12sp"
+                    android:textColor="#2E7D32" />
 
-                <!-- NOMBRE PLANTA -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Planta"
-                        android:textColor="#555555"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/txtNombrePlanta"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#1B5E20"
-                        android:textStyle="bold"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#E8F5E9" />
-
-                <!-- RIEGO -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Tipo de riego"
-                        android:textColor="#555555"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/txtRiegoCultivo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:textStyle="bold"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#E8F5E9" />
-
-                <!-- ABONO -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Abono necesario"
-                        android:textColor="#555555"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/txtAbonoCultivo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:textStyle="bold"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#E8F5E9" />
-
-                <!-- TIEMPO CRECIMIENTO -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Tiempo de crecimiento"
-                        android:textColor="#555555"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/txtTiempoCultivo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#333333"
-                        android:textStyle="bold"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#E8F5E9" />
-
-                <!-- ESTADO -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Estado"
-                        android:textColor="#555555"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/txtEstadoCultivo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:textSize="12sp" />
-                </LinearLayout>
+                <!-- Warning icon si enfermo -->
+                <ImageView
+                    android:id="@+id/iconWarning"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@android:drawable/ic_dialog_alert"
+                    android:tint="#FFC107"
+                    android:layout_marginStart="6dp"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
@@ -276,50 +105,48 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#FFF9C4"
-                android:padding="8dp"
-                android:textSize="11sp"
+                android:padding="6dp"
+                android:textSize="10sp"
                 android:textColor="#856404"
+                android:layout_marginBottom="8dp"
                 android:visibility="gone" />
-
-            <!-- DIVISOR -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E8F5E9" />
 
             <!-- BOTONES DE ACCIÓN -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:background="#F9FBF9">
+                android:gravity="end">
+
+                <!-- EDITAR -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEditarCultivo"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="44dp"
+                    android:text="Editar"
+                    android:textSize="13sp"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#FF9800"
+                    android:layout_marginEnd="8dp"
+                    app:cornerRadius="10dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="4dp"
+                    style="@style/Widget.MaterialComponents.Button" />
 
                 <!-- ELIMINAR -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEliminarCultivo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:text="🗑 Eliminar"
-                    android:textSize="12sp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="44dp"
+                    android:text="Eliminar"
+                    android:textSize="13sp"
                     android:textColor="#FFFFFF"
                     android:backgroundTint="#C62828"
                     app:cornerRadius="10dp"
-                    style="@style/Widget.MaterialComponents.Button" />
-
-                <!-- VER DETALLE PLANTA -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnVerCultivo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="📖 Ver planta"
-                    android:textSize="12sp"
-                    android:textColor="#FFFFFF"
-                    android:backgroundTint="#2E7D32"
-                    app:cornerRadius="10dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="4dp"
                     style="@style/Widget.MaterialComponents.Button" />
 
             </LinearLayout>

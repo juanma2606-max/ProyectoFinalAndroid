@@ -21,13 +21,22 @@ public class UserDAO {
 
     public UserDAO() {
         this.auth = FirebaseAuth.getInstance();
+        // Apunta a /users (raíz usuarios)
         this.usersRef = FirebaseDatabase.getInstance().getReference("users");
+    }
+
+    // ---------------------------------------------------------
+    // Referencia al perfil del usuario
+    // ---------------------------------------------------------
+    private DatabaseReference getProfileRef(String uid) {
+        return usersRef.child(uid).child("profile");
     }
 
     // ---------------------------------------------------------
     // Obtener todos los usuarios
     // ---------------------------------------------------------
     public void getAllPersons(ValueEventListener listener) {
+        // Obtener todos los perfiles
         usersRef.addValueEventListener(listener);
     }
 
@@ -35,19 +44,20 @@ public class UserDAO {
     // Obtener un usuario por ID
     // ---------------------------------------------------------
     public void getPersonById(String uid, ValueEventListener listener) {
-        usersRef.child(uid).addListenerForSingleValueEvent(listener);
+        // Leer desde /users/{uid}/profile
+        getProfileRef(uid).addListenerForSingleValueEvent(listener);
     }
 
     // ---------------------------------------------------------
     // Verificar si usuario es admin
     // ---------------------------------------------------------
     public void isAdmin(String uid, OnAdminCheckCallback callback) {
-        usersRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+        getProfileRef(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
                 if (user != null) {
-                    callback.onResult(user.isAdmin());
+                    callback.onResult(user.esAdmin());
                 } else {
                     callback.onResult(false);
                 }
@@ -64,11 +74,11 @@ public class UserDAO {
     // Verificar si usuario está baneado
     // ---------------------------------------------------------
     public void isBanned(String uid, OnBanCheckCallback callback) {
-        usersRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+        getProfileRef(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                if (user != null && user.isBaneado()) {
+                if (user != null && user.estaBaneado()) {
                     callback.onBanned(true, user.getMotivoBaneo());
                 } else {
                     callback.onBanned(false, null);
@@ -86,14 +96,14 @@ public class UserDAO {
     // Crear un usuario en Firebase
     // ---------------------------------------------------------
     public void createPerson(User person) {
-        usersRef.child(person.uid).setValue(person);
+        getProfileRef(person.getUid()).setValue(person);
     }
 
     // ---------------------------------------------------------
     // Crear usuario con callback
     // ---------------------------------------------------------
     public void createPerson(User person, OnOperationCallback callback) {
-        usersRef.child(person.uid).setValue(person)
+        getProfileRef(person.getUid()).setValue(person)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onError);
     }
@@ -102,14 +112,38 @@ public class UserDAO {
     // Actualizar un usuario
     // ---------------------------------------------------------
     public void updatePerson(User person) {
-        usersRef.child(person.uid).setValue(person);
+        getProfileRef(person.getUid()).setValue(person);
     }
 
     // ---------------------------------------------------------
     // Actualizar usuario con callback
     // ---------------------------------------------------------
     public void updatePerson(User person, OnOperationCallback callback) {
-        usersRef.child(person.uid).setValue(person)
+        getProfileRef(person.getUid()).setValue(person)
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(callback::onError);
+    }
+
+    // ---------------------------------------------------------
+    // Actualizar nombre de usuario
+    // ---------------------------------------------------------
+    public void updateUsername(String uid, String nuevoNombre, OnOperationCallback callback) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("username", nuevoNombre);
+
+        getProfileRef(uid).updateChildren(updates)
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(callback::onError);
+    }
+
+    // ---------------------------------------------------------
+    // Actualizar foto de perfil
+    // ---------------------------------------------------------
+    public void updateProfilePhoto(String uid, String foto, OnOperationCallback callback) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("fotoPerfil", foto);
+
+        getProfileRef(uid).updateChildren(updates)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onError);
     }
@@ -122,7 +156,7 @@ public class UserDAO {
         updates.put("baneado", true);
         updates.put("motivoBaneo", motivo);
 
-        usersRef.child(uid).updateChildren(updates)
+        getProfileRef(uid).updateChildren(updates)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onError);
     }
@@ -135,7 +169,7 @@ public class UserDAO {
         updates.put("baneado", false);
         updates.put("motivoBaneo", null);
 
-        usersRef.child(uid).updateChildren(updates)
+        getProfileRef(uid).updateChildren(updates)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onError);
     }
@@ -147,7 +181,7 @@ public class UserDAO {
         Map<String, Object> updates = new HashMap<>();
         updates.put("admin", true);
 
-        usersRef.child(uid).updateChildren(updates)
+        getProfileRef(uid).updateChildren(updates)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onError);
     }
@@ -159,7 +193,7 @@ public class UserDAO {
         Map<String, Object> updates = new HashMap<>();
         updates.put("admin", false);
 
-        usersRef.child(uid).updateChildren(updates)
+        getProfileRef(uid).updateChildren(updates)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
                 .addOnFailureListener(callback::onError);
     }
@@ -168,7 +202,7 @@ public class UserDAO {
     // Eliminar un usuario completamente
     // ---------------------------------------------------------
     public void removePerson(String uid) {
-        usersRef.child(uid).removeValue();
+        usersRef.child(uid).removeValue();  // Elimina todo el nodo del usuario
     }
 
     // ---------------------------------------------------------
@@ -179,7 +213,7 @@ public class UserDAO {
         banUser(uid, "Usuario eliminado permanentemente", new OnOperationCallback() {
             @Override
             public void onSuccess() {
-                // Luego eliminar sus datos
+                // Luego eliminar TODO el nodo del usuario
                 usersRef.child(uid).removeValue()
                         .addOnSuccessListener(aVoid -> callback.onSuccess())
                         .addOnFailureListener(callback::onError);
@@ -212,7 +246,7 @@ public class UserDAO {
                         return;
                     }
 
-                    // Crear usuario en database
+                    // Crear usuario en database en /users/{uid}/profile
                     User user = new User(firebaseUser.getUid(), username, email);
                     createPerson(user, new OnOperationCallback() {
                         @Override

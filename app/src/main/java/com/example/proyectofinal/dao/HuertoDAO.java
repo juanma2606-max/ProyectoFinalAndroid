@@ -29,9 +29,6 @@ public class HuertoDAO {
         auth = FirebaseAuth.getInstance();
     }
 
-    // ---------------------------------------------------------
-    // Usuario autenticado actual
-    // ---------------------------------------------------------
     private FirebaseUser getUser() {
         return auth.getCurrentUser();
     }
@@ -39,29 +36,23 @@ public class HuertoDAO {
     private DatabaseReference getHuertosRef() {
         FirebaseUser user = getUser();
         if (user == null) return null;
-        return database.getReference("usuarios")
+        return database.getReference("users")
                 .child(user.getUid())
                 .child("huertos");
     }
 
     private DatabaseReference getHuertosRefForUser(String uid) {
-        return database.getReference("usuarios")
+        return database.getReference("users")
                 .child(uid)
                 .child("huertos");
     }
 
-    // ---------------------------------------------------------
-    // Escucha en tiempo real todos los huertos del usuario
-    // ---------------------------------------------------------
     public void getAllHuertos(ValueEventListener listener) {
         DatabaseReference ref = getHuertosRef();
         if (ref == null) return;
         ref.addValueEventListener(listener);
     }
 
-    // ---------------------------------------------------------
-    // Obtener todos los huertos con callback
-    // ---------------------------------------------------------
     public void getAllHuertosOnce(OnHuertosLoadedCallback callback) {
         DatabaseReference ref = getHuertosRef();
         if (ref == null) {
@@ -90,9 +81,6 @@ public class HuertoDAO {
         });
     }
 
-    // ---------------------------------------------------------
-    // Obtener huertos de otro usuario (para admin)
-    // ---------------------------------------------------------
     public void getHuertosByUid(String uid, OnHuertosLoadedCallback callback) {
         DatabaseReference ref = getHuertosRefForUser(uid);
 
@@ -117,27 +105,18 @@ public class HuertoDAO {
         });
     }
 
-    // ---------------------------------------------------------
-    // Detener escucha en tiempo real
-    // ---------------------------------------------------------
     public void removeListener(ValueEventListener listener) {
         DatabaseReference ref = getHuertosRef();
         if (ref == null) return;
         ref.removeEventListener(listener);
     }
 
-    // ---------------------------------------------------------
-    // Obtener un huerto por ID
-    // ---------------------------------------------------------
     public void getHuertoById(String id, ValueEventListener listener) {
         DatabaseReference ref = getHuertosRef();
         if (ref == null) return;
         ref.child(id).addListenerForSingleValueEvent(listener);
     }
 
-    // ---------------------------------------------------------
-    // Obtener huerto por ID con callback
-    // ---------------------------------------------------------
     public void getHuertoById(String id, OnHuertoLoadedCallback callback) {
         DatabaseReference ref = getHuertosRef();
         if (ref == null) {
@@ -164,9 +143,6 @@ public class HuertoDAO {
         });
     }
 
-    // ---------------------------------------------------------
-    // Obtener huerto de otro usuario (para admin)
-    // ---------------------------------------------------------
     public void getHuertoByUidAndId(String uid, String huertoId, OnHuertoLoadedCallback callback) {
         DatabaseReference ref = getHuertosRefForUser(uid);
 
@@ -189,9 +165,6 @@ public class HuertoDAO {
         });
     }
 
-    // ---------------------------------------------------------
-    // Crear un nuevo huerto
-    // ---------------------------------------------------------
     public void createHuerto(Huerto huerto, OnCompleteCallback callback) {
         DatabaseReference ref = getHuertosRef();
         if (ref == null) {
@@ -208,9 +181,9 @@ public class HuertoDAO {
         data.put("foto", huerto.getFoto());
         data.put("ubicacion", huerto.getUbicacion());
         data.put("superficie", huerto.getSuperficie());
-        data.put("tipo_suelo", huerto.getTipoSuelo());
-        data.put("horas_sol", huerto.getHorasSol());
-        data.put("tiene_riego", huerto.isTieneRiego());
+        data.put("tipo_suelo", huerto.getTipo_suelo());
+        data.put("horas_sol", huerto.getHoras_sol());
+        data.put("tiene_riego", huerto.getTiene_riego());
         data.put("notas", huerto.getNotas());
         data.put("fecha_creacion", fecha);
 
@@ -219,9 +192,6 @@ public class HuertoDAO {
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
-    // ---------------------------------------------------------
-    // Actualizar un huerto existente
-    // ---------------------------------------------------------
     public void updateHuerto(Huerto huerto, OnCompleteCallback callback) {
         DatabaseReference ref = getHuertosRef();
         if (ref == null) {
@@ -235,9 +205,9 @@ public class HuertoDAO {
         data.put("foto", huerto.getFoto());
         data.put("ubicacion", huerto.getUbicacion());
         data.put("superficie", huerto.getSuperficie());
-        data.put("tipo_suelo", huerto.getTipoSuelo());
-        data.put("horas_sol", huerto.getHorasSol());
-        data.put("tiene_riego", huerto.isTieneRiego());
+        data.put("tipo_suelo", huerto.getTipo_suelo());
+        data.put("horas_sol", huerto.getHoras_sol());
+        data.put("tiene_riego", huerto.getTiene_riego());
         data.put("notas", huerto.getNotas());
 
         ref.child(huerto.getId()).updateChildren(data)
@@ -245,9 +215,6 @@ public class HuertoDAO {
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
-    // ---------------------------------------------------------
-    // Eliminar un huerto
-    // ---------------------------------------------------------
     public void removeHuerto(String id, OnCompleteCallback callback) {
         DatabaseReference ref = getHuertosRef();
         if (ref == null) {
@@ -260,9 +227,6 @@ public class HuertoDAO {
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
-    // ---------------------------------------------------------
-    // Contar número de huertos
-    // ---------------------------------------------------------
     public void getHuertosCount(OnCountCallback callback) {
         DatabaseReference ref = getHuertosRef();
         if (ref == null) {
@@ -283,9 +247,6 @@ public class HuertoDAO {
         });
     }
 
-    // ---------------------------------------------------------
-    // Callbacks
-    // ---------------------------------------------------------
     public interface OnCompleteCallback {
         void onSuccess();
         void onError(String message);

@@ -1,4 +1,13 @@
 <resources>
+    <string-array name="tipos_suelo">
+        <item>arenoso</item>
+        <item>arcilloso</item>
+        <item>franco</item>
+        <item>limoso</item>
+        <item>pedregoso</item>
+        <item>humífero</item>
+        <item>mixto</item>
+    </string-array>
     <string name="app_name">Proyecto final</string>
     <string name="detalle_planta">Detalle de planta</string>
     <string name="necesidades_caracteristicas">🌱 Necesidades y Características</string>

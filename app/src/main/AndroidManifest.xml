@@ -14,6 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProyectoFinal">
         <activity
+            android:name=".activities.ChatActivity"
+            android:exported="false" />
+        <activity
             android:name=".fragments.AjustesFragment"
             android:exported="false" />
 
@@ -55,6 +58,8 @@
         <activity
             android:name=".activities.AmenazasDetallesActivity"
             android:exported="false" />
+        <activity android:name=".activities.EditarHuertoActivity" />
+        <activity android:name=".activities.EditarCultivoActivity" />
     </application>
 
 </manifest>

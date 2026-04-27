@@ -74,14 +74,15 @@ public class HomeFragment extends Fragment {
             @Override
             public void onVer(Huerto huerto) {
                 Intent i = new Intent(requireContext(), HuertoDetalleActivity.class);
-                i.putExtra("huertoId", huerto.id);
+                i.putExtra("huertoId", huerto.getId());
                 startActivity(i);
             }
 
-
             @Override
             public void onEditar(Huerto huerto) {
-                // TODO: implementar más adelante
+                Intent i = new Intent(requireContext(), com.example.proyectofinal.activities.EditarHuertoActivity.class);
+                i.putExtra("huertoId", huerto.getId());
+                startActivity(i);
             }
 
             @Override
@@ -110,7 +111,7 @@ public class HomeFragment extends Fragment {
                 for (DataSnapshot child : snapshot.getChildren()) {
                     Huerto h = child.getValue(Huerto.class);
                     if (h != null) {
-                        h.id = child.getKey();
+                        h.setId(child.getKey());  // ← CORREGIDO: usar setter en lugar de acceso directo
                         huertos.add(h);
                     }
                 }
@@ -124,8 +125,6 @@ public class HomeFragment extends Fragment {
                     emptyState.setVisibility(View.GONE);
                     recycler.setVisibility(View.VISIBLE);
                 }
-
-
             }
 
             @Override
@@ -143,9 +142,8 @@ public class HomeFragment extends Fragment {
     // ---------------------------------------------------------
     private void abrirDetalle(Huerto huerto) {
         // TODO: navegar a HuertoDetalleActivity o MacetaDetalleActivity según tipo
-        Toast.makeText(requireContext(), "Ver: " + huerto.nombre, Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), "Ver: " + huerto.getNombre(), Toast.LENGTH_SHORT).show();
     }
-
 
     // ---------------------------------------------------------
     // Diálogo ELIMINAR — equivalente al modal de confirmación
@@ -153,11 +151,11 @@ public class HomeFragment extends Fragment {
     private void mostrarDialogoEliminar(Huerto huerto) {
         new AlertDialog.Builder(requireContext())
                 .setTitle("¿Eliminar huerto?")
-                .setMessage("¿Estás seguro de querer eliminar \"" + huerto.nombre
+                .setMessage("¿Estás seguro de querer eliminar \"" + huerto.getNombre()
                         + "\"?\nEsta acción no se puede deshacer.")
                 .setPositiveButton("Eliminar", (d, w) ->
                         // Delegamos al DAO — equivalente a huertoService.removeObject()
-                        huertoDAO.removeHuerto(huerto.id, new HuertoDAO.OnCompleteCallback() {
+                        huertoDAO.removeHuerto(huerto.getId(), new HuertoDAO.OnCompleteCallback() {
                             @Override
                             public void onSuccess() {
                                 Toast.makeText(requireContext(), "Huerto eliminado", Toast.LENGTH_SHORT).show();

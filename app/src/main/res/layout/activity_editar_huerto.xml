@@ -22,13 +22,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🌱"
+                android:text="🌿"
                 android:textSize="72sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Añadir cultivo"
+                android:text="Editar huerto"
                 android:textColor="#A5D6A7"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -38,7 +38,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Elige la planta que vas a cultivar"
+                android:text="Modifica los datos de tu huerto"
                 android:textColor="#81C784"
                 android:textSize="14sp"
                 android:gravity="center"
@@ -46,7 +46,7 @@
 
         </LinearLayout>
 
-        <!-- FORMULARIO -->
+        <!-- FORMULARIO (IGUAL QUE AGREGAR) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,11 +54,40 @@
             android:padding="20dp"
             android:background="#F8F9FA">
 
-            <!-- SELECTOR DE PLANTA -->
+            <!-- BOTÓN VOLVER -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageButton
+                    android:id="@+id/btnVolver"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:src="@android:drawable/ic_menu_revert"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="6dp"
+                    android:contentDescription="Volver" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="6dp"
+                    android:text="Volver"
+                    android:textColor="#666666"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+            <!-- SELECTOR DE FOTOS -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Planta"
+                android:text="Foto del huerto"
                 android:textStyle="bold"
                 android:textColor="#333333"
                 android:textSize="15sp"
@@ -67,23 +96,85 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Selecciona la planta que vas a cultivar"
+                android:text="Selecciona una imagen para tu huerto"
                 android:textColor="#666666"
                 android:textSize="12sp"
                 android:layout_marginBottom="12dp" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvPlantas"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:nestedScrollingEnabled="false" />
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="20dp">
 
-            <!-- NOMBRE CULTIVO (OPCIONAL) -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardFoto1"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="100dp"
+                    android:layout_margin="4dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:id="@+id/imgFoto1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop" />
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardFoto2"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="100dp"
+                    android:layout_margin="4dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:id="@+id/imgFoto2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop" />
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardFoto3"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="100dp"
+                    android:layout_margin="4dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:id="@+id/imgFoto3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop" />
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+            <!-- RESTO DEL FORMULARIO IGUAL -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nombre del cultivo"
+                android:text="Nombre"
                 android:textStyle="bold"
                 android:textColor="#333333"
                 android:textSize="15sp"
@@ -98,19 +189,75 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etNombreCultivo"
+                    android:id="@+id/etNombreHuerto"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Ej: Tomates del balcón (opcional)"
+                    android:hint="Mi huerto urbano"
+                    android:inputType="textCapSentences"
+                    android:maxLines="1" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Descripción"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:layout_marginBottom="4dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#2E7D32"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDescripcionHuerto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Descripción opcional"
+                    android:inputType="textMultiLine"
+                    android:minLines="2"
+                    android:maxLines="3"
+                    android:gravity="top" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ubicación"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:layout_marginBottom="4dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#2E7D32"
+                app:startIconDrawable="@android:drawable/ic_menu_mylocation"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etUbicacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ej: Sevilla, terraza del piso"
                     android:inputType="text" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- CANTIDAD -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cantidad de plantas"
+                android:text="Superficie (m²)"
                 android:textStyle="bold"
                 android:textColor="#333333"
                 android:textSize="15sp"
@@ -122,162 +269,73 @@
                 android:layout_marginBottom="16dp"
                 app:boxStrokeColor="#2E7D32"
                 app:hintTextColor="#2E7D32"
+                app:suffixText="m²"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etCantidad"
+                    android:id="@+id/etSuperficie"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="¿Cuántas plantas?"
-                    android:inputType="number"
-                    android:text="1" />
+                    android:hint="10.0"
+                    android:inputType="numberDecimal" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- FECHA SIEMBRA -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Fecha de siembra"
-                android:textStyle="bold"
-                android:textColor="#333333"
-                android:textSize="15sp"
-                android:layout_marginBottom="4dp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:boxStrokeColor="#2E7D32"
-                app:hintTextColor="#2E7D32"
-                app:endIconMode="custom"
-                app:endIconDrawable="@android:drawable/ic_menu_my_calendar"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etFechaSiembra"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Selecciona la fecha"
-                    android:inputType="none"
-                    android:focusable="false"
-                    android:clickable="true" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- ESTADO -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Estado inicial"
+                android:text="Tipo de suelo"
                 android:textStyle="bold"
                 android:textColor="#333333"
                 android:textSize="15sp"
                 android:layout_marginBottom="8dp" />
 
-            <RadioGroup
-                android:id="@+id/rgEstado"
+            <Spinner
+                android:id="@+id/spinnerTipoSuelo"
                 android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:background="@android:drawable/editbox_background"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="16dp">
+                android:text="Horas de sol diarias"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:layout_marginBottom="4dp" />
 
-                <RadioButton
-                    android:id="@+id/rbPlantado"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="🌱 Plantado"
-                    android:checked="true"
-                    android:textColor="#6C757D"
-                    android:buttonTint="#6C757D"
-                    android:padding="12dp" />
-
-                <RadioButton
-                    android:id="@+id/rbCreciendo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="🌿 Creciendo"
-                    android:textColor="#0DCAF0"
-                    android:buttonTint="#0DCAF0"
-                    android:padding="12dp" />
-
-                <RadioButton
-                    android:id="@+id/rbMaduro"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="✅ Maduro"
-                    android:textColor="#198754"
-                    android:buttonTint="#198754"
-                    android:padding="12dp" />
-
-                <RadioButton
-                    android:id="@+id/rbCosechado"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="📦 Cosechado"
-                    android:textColor="#212529"
-                    android:buttonTint="#212529"
-                    android:padding="12dp" />
-
-                <RadioButton
-                    android:id="@+id/rbEnfermo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="⚠️ Enfermo"
-                    android:textColor="#FFC107"
-                    android:buttonTint="#FFC107"
-                    android:padding="12dp" />
-
-            </RadioGroup>
-
-            <!-- SELECTOR AMENAZAS (visible solo si enfermo) -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardAmenazas"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:visibility="gone"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="3dp"
-                app:cardBackgroundColor="#FFF3CD"
-                app:strokeColor="#FFC107"
-                app:strokeWidth="2dp">
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#2E7D32"
+                app:suffixText="horas/día"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                <LinearLayout
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etHorasSol"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:hint="6"
+                    android:inputType="number" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="⚠️ Amenaza detectada"
-                        android:textStyle="bold"
-                        android:textColor="#856404"
-                        android:textSize="15sp"
-                        android:layout_marginBottom="4dp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Selecciona la plaga o enfermedad"
-                        android:textColor="#856404"
-                        android:textSize="12sp"
-                        android:layout_marginBottom="12dp" />
+            <CheckBox
+                android:id="@+id/cbTieneRiego"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="¿Tiene sistema de riego?"
+                android:textColor="#333333"
+                android:textSize="14sp"
+                android:buttonTint="#2E7D32"
+                android:layout_marginBottom="16dp" />
 
-                    <Spinner
-                        android:id="@+id/spinnerAmenazas"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@android:drawable/btn_dropdown"
-                        android:padding="12dp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- NOTAS -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -299,7 +357,7 @@
                     android:id="@+id/etNotas"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Observaciones (opcional)"
+                    android:hint="Notas adicionales (opcional)"
                     android:inputType="textMultiLine"
                     android:minLines="3"
                     android:maxLines="5"
@@ -307,19 +365,17 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- BOTÓN GUARDAR -->
             <Button
                 android:id="@+id/btnGuardar"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Añadir cultivo"
+                android:text="Guardar cambios"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
                 android:backgroundTint="#2E7D32"
                 android:layout_marginBottom="12dp" />
 
-            <!-- BOTÓN CANCELAR -->
             <Button
                 android:id="@+id/btnCancelar"
                 android:layout_width="match_parent"
@@ -334,17 +390,6 @@
                 app:strokeWidth="2dp" />
 
         </LinearLayout>
-
-        <!-- HINT FINAL -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Podrás cambiar el estado del cultivo en cualquier momento"
-            android:textColor="#A5D6A7"
-            android:textSize="12sp"
-            android:gravity="center"
-            android:padding="16dp"
-            android:background="#1B2A1B" />
 
     </LinearLayout>
 </ScrollView>

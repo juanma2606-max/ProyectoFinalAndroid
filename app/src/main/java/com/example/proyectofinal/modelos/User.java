@@ -1,12 +1,16 @@
 package com.example.proyectofinal.modelos;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
+@IgnoreExtraProperties
 public class User {
-    public String uid;
-    public String username;
-    public String email;
-    public Boolean admin;
-    public Boolean baneado;
-    public String motivoBaneo;
+    private String uid;
+    private String username;
+    private String email;
+    private Boolean admin;
+    private Boolean baneado;
+    private String motivoBaneo;
+    private String fotoPerfil;
 
     // Constructor vacío necesario para Firebase
     public User() {
@@ -20,6 +24,7 @@ public class User {
         this.admin = false;
         this.baneado = false;
         this.motivoBaneo = null;
+        this.fotoPerfil = "perfil1.png"; // Foto por defecto
     }
 
     // Constructor completo
@@ -30,6 +35,7 @@ public class User {
         this.admin = admin != null ? admin : false;
         this.baneado = baneado != null ? baneado : false;
         this.motivoBaneo = motivoBaneo;
+        this.fotoPerfil = "perfil1.png"; // Foto por defecto
     }
 
     // Getters
@@ -57,6 +63,10 @@ public class User {
         return motivoBaneo;
     }
 
+    public String getFotoPerfil() {
+        return fotoPerfil;
+    }
+
     // Setters
     public void setUid(String uid) {
         this.uid = uid;
@@ -82,12 +92,16 @@ public class User {
         this.motivoBaneo = motivoBaneo;
     }
 
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
+    }
+
     // Métodos de utilidad
-    public boolean isAdmin() {
+    public boolean esAdmin() {
         return admin != null && admin;
     }
 
-    public boolean isBaneado() {
+    public boolean estaBaneado() {
         return baneado != null && baneado;
     }
 
@@ -100,6 +114,7 @@ public class User {
                 ", admin=" + admin +
                 ", baneado=" + baneado +
                 ", motivoBaneo='" + motivoBaneo + '\'' +
+                ", fotoPerfil='" + fotoPerfil + '\'' +
                 '}';
     }
 }

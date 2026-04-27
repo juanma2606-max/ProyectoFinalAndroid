@@ -1,17 +1,20 @@
 package com.example.proyectofinal.modelos;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
+@IgnoreExtraProperties
 public class Huerto {
-    public String id;
-    public String nombre;
-    public String descripcion;
-    public String foto;
-    public String ubicacion;
-    public double superficie;
-    public String tipo_suelo;
-    public int horas_sol;
-    public boolean tiene_riego;
-    public String notas;
-    public String fecha_creacion;
+    private String id;
+    private String nombre;
+    private String descripcion;
+    private String foto;
+    private String ubicacion;
+    private double superficie;
+    private String tipo_suelo;
+    private int horas_sol;
+    private boolean tiene_riego;
+    private String notas;
+    private String fecha_creacion;
 
     // Constructor vacío necesario para Firebase
     public Huerto() {
@@ -50,95 +53,31 @@ public class Huerto {
         this.fecha_creacion = fecha_creacion != null ? fecha_creacion : getCurrentDate();
     }
 
-    // Getters
-    public String getId() {
-        return id;
-    }
+    // Getters - nombres EXACTOS para Firebase
+    public String getId() { return id; }
+    public String getNombre() { return nombre; }
+    public String getDescripcion() { return descripcion; }
+    public String getFoto() { return foto; }
+    public String getUbicacion() { return ubicacion; }
+    public double getSuperficie() { return superficie; }
+    public String getTipo_suelo() { return tipo_suelo; }
+    public int getHoras_sol() { return horas_sol; }
+    public boolean getTiene_riego() { return tiene_riego; }
+    public String getNotas() { return notas; }
+    public String getFecha_creacion() { return fecha_creacion; }
 
-    public String getNombre() {
-        return nombre;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public String getFoto() {
-        return foto;
-    }
-
-    public String getUbicacion() {
-        return ubicacion;
-    }
-
-    public double getSuperficie() {
-        return superficie;
-    }
-
-    public String getTipoSuelo() {
-        return tipo_suelo;
-    }
-
-    public int getHorasSol() {
-        return horas_sol;
-    }
-
-    public boolean isTieneRiego() {
-        return tiene_riego;
-    }
-
-    public String getNotas() {
-        return notas;
-    }
-
-    public String getFechaCreacion() {
-        return fecha_creacion;
-    }
-
-    // Setters
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public void setFoto(String foto) {
-        this.foto = foto;
-    }
-
-    public void setUbicacion(String ubicacion) {
-        this.ubicacion = ubicacion;
-    }
-
-    public void setSuperficie(double superficie) {
-        this.superficie = superficie;
-    }
-
-    public void setTipoSuelo(String tipo_suelo) {
-        this.tipo_suelo = tipo_suelo;
-    }
-
-    public void setHorasSol(int horas_sol) {
-        this.horas_sol = horas_sol;
-    }
-
-    public void setTieneRiego(boolean tiene_riego) {
-        this.tiene_riego = tiene_riego;
-    }
-
-    public void setNotas(String notas) {
-        this.notas = notas;
-    }
-
-    public void setFechaCreacion(String fecha_creacion) {
-        this.fecha_creacion = fecha_creacion;
-    }
+    // Setters - nombres EXACTOS para Firebase
+    public void setId(String id) { this.id = id; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public void setFoto(String foto) { this.foto = foto; }
+    public void setUbicacion(String ubicacion) { this.ubicacion = ubicacion; }
+    public void setSuperficie(double superficie) { this.superficie = superficie; }
+    public void setTipo_suelo(String tipo_suelo) { this.tipo_suelo = tipo_suelo; }
+    public void setHoras_sol(int horas_sol) { this.horas_sol = horas_sol; }
+    public void setTiene_riego(boolean tiene_riego) { this.tiene_riego = tiene_riego; }
+    public void setNotas(String notas) { this.notas = notas; }
+    public void setFecha_creacion(String fecha_creacion) { this.fecha_creacion = fecha_creacion; }
 
     // Métodos de utilidad
     public String getSuperficieTexto() {
@@ -166,7 +105,6 @@ public class Huerto {
         return notas != null && !notas.isEmpty();
     }
 
-    // Obtener fecha actual en formato ISO
     private static String getCurrentDate() {
         return new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
                 java.util.Locale.getDefault()).format(new java.util.Date());

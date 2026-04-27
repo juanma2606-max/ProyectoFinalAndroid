@@ -13,6 +13,11 @@
         />
 
     <item
+        android:id="@+id/nav_chat"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:title="Chat IA" />
+
+    <item
         android:id="@+id/nav_amenazas"
         android:title="Amenazas"
         android:icon="@drawable/ic_amenazas"

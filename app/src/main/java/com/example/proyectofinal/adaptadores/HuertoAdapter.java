@@ -97,15 +97,34 @@ public class HuertoAdapter extends RecyclerView.Adapter<HuertoAdapter.ViewHolder
             holder.txtRiego.setText("💧 " + huerto.getRiegoTexto());
         }
 
-        // Imagen del huerto
+        // Imagen del huerto - cargar desde drawable
         if (huerto.tieneFoto()) {
-            Picasso.get()
-                    .load(huerto.getFoto())
-                    .placeholder(R.drawable.img_huerto_default)
-                    .error(R.drawable.img_huerto_default)
-                    .into(holder.imgHuerto);
+            String foto = huerto.getFoto(); // "huerto1.jpg", "huerto2.webp", etc.
+
+            // Quitar extensión para buscar drawable
+            String nombreSinExtension = foto
+                    .replace("/images/", "")
+                    .replace(".jpg", "")
+                    .replace(".webp", "")
+                    .replace(".png", "");
+
+            // Buscar drawable por nombre
+            int resId = context.getResources().getIdentifier(
+                    nombreSinExtension,  // "huerto1", "huerto2", "huerto3"
+                    "drawable",
+                    context.getPackageName()
+            );
+
+            if (resId != 0) {
+                // Imagen encontrada - cargarla
+                holder.imgHuerto.setImageResource(resId);
+            } else {
+                // Imagen no encontrada - placeholder genérico
+                holder.imgHuerto.setImageResource(android.R.drawable.ic_menu_gallery);
+            }
         } else {
-            holder.imgHuerto.setImageResource(R.drawable.img_huerto_default);
+            // Sin foto - placeholder genérico
+            holder.imgHuerto.setImageResource(android.R.drawable.ic_menu_gallery);
         }
 
         // CARD CLICKEABLE = VER HUERTO

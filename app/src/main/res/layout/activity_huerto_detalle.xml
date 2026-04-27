@@ -72,7 +72,7 @@
                     android:scaleType="centerCrop"
                     android:background="#1B3A1B" />
 
-                <!-- CARD DESCRIPCIÓN -->
+                <!-- CARD DESCRIPCIÓN - COLAPSABLE -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -84,31 +84,64 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                        android:orientation="vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="📋 Descripción"
-                            android:textColor="#A5D6A7"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="8dp" />
-
-                        <TextView
-                            android:id="@+id/txtDescripcionHuerto"
+                        <!-- HEADER CLICKEABLE -->
+                        <LinearLayout
+                            android:id="@+id/headerDescripcion"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textColor="#CCCCCC"
-                            android:textSize="14sp"
-                            android:lineSpacingExtra="4dp" />
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="16dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="📋 Descripción"
+                                android:textColor="#A5D6A7"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <ImageView
+                                android:id="@+id/iconDescripcion"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/arrow_down_float"
+                                app:tint="#A5D6A7" />
+
+                        </LinearLayout>
+
+                        <!-- CONTENIDO COLAPSABLE -->
+                        <LinearLayout
+                            android:id="@+id/contentDescripcion"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="16dp"
+                            android:visibility="visible">
+
+                            <TextView
+                                android:id="@+id/txtDescripcionHuerto"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textColor="#CCCCCC"
+                                android:textSize="14sp"
+                                android:lineSpacingExtra="4dp" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- CARD INFORMACIÓN DEL HUERTO -->
+                <!-- CARD INFORMACIÓN DEL HUERTO - COLAPSABLE -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardInfoHuerto"
                     android:layout_width="match_parent"
@@ -123,112 +156,105 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                        android:orientation="vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="ℹ️ Información del huerto"
-                            android:textColor="#A5D6A7"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="12dp" />
-
-                        <!-- Ubicación -->
+                        <!-- HEADER CLICKEABLE -->
                         <LinearLayout
+                            android:id="@+id/headerInfo"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
-                            android:layout_marginBottom="8dp">
+                            android:padding="16dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true">
 
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="ℹ️ Información del huerto"
+                                android:textColor="#A5D6A7"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <ImageView
+                                android:id="@+id/iconInfo"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/arrow_down_float"
+                                app:tint="#A5D6A7" />
+
+                        </LinearLayout>
+
+                        <!-- CONTENIDO COLAPSABLE -->
+                        <LinearLayout
+                            android:id="@+id/contentInfo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="16dp"
+                            android:visibility="gone">
+
+                            <!-- Ubicación -->
                             <TextView
                                 android:id="@+id/txtUbicacion"
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
                                 android:text="📍 Ubicación"
                                 android:textColor="#CCCCCC"
-                                android:textSize="14sp" />
-                        </LinearLayout>
+                                android:textSize="14sp"
+                                android:layout_marginBottom="8dp" />
 
-                        <!-- Superficie -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="8dp">
-
+                            <!-- Superficie -->
                             <TextView
                                 android:id="@+id/txtSuperficie"
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
                                 android:text="📏 Superficie"
                                 android:textColor="#CCCCCC"
-                                android:textSize="14sp" />
-                        </LinearLayout>
+                                android:textSize="14sp"
+                                android:layout_marginBottom="8dp" />
 
-                        <!-- Tipo de suelo -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="8dp">
-
+                            <!-- Tipo de suelo -->
                             <TextView
                                 android:id="@+id/txtTipoSuelo"
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
                                 android:text="🌱 Tipo de suelo"
                                 android:textColor="#CCCCCC"
-                                android:textSize="14dp" />
-                        </LinearLayout>
+                                android:textSize="14sp"
+                                android:layout_marginBottom="8dp" />
 
-                        <!-- Horas de sol -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="8dp">
-
+                            <!-- Horas de sol -->
                             <TextView
                                 android:id="@+id/txtHorasSol"
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
                                 android:text="☀️ Horas de sol"
                                 android:textColor="#CCCCCC"
-                                android:textSize="14sp" />
-                        </LinearLayout>
+                                android:textSize="14sp"
+                                android:layout_marginBottom="8dp" />
 
-                        <!-- Riego -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
+                            <!-- Riego -->
                             <TextView
                                 android:id="@+id/txtRiego"
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
                                 android:text="💧 Riego"
                                 android:textColor="#CCCCCC"
                                 android:textSize="14sp" />
+
                         </LinearLayout>
 
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- CARD NOTAS (visible solo si hay notas) -->
+                <!-- CARD NOTAS - COLAPSABLE (visible solo si hay notas) -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardNotas"
                     android:layout_width="match_parent"
@@ -244,25 +270,58 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                        android:orientation="vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="📝 Notas"
-                            android:textColor="#C5E1A5"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="8dp" />
-
-                        <TextView
-                            android:id="@+id/txtNotas"
+                        <!-- HEADER CLICKEABLE -->
+                        <LinearLayout
+                            android:id="@+id/headerNotas"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textColor="#E8F5E9"
-                            android:textSize="14sp"
-                            android:lineSpacingExtra="4dp" />
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="16dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="📝 Notas"
+                                android:textColor="#C5E1A5"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <ImageView
+                                android:id="@+id/iconNotas"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@android:drawable/arrow_down_float"
+                                app:tint="#C5E1A5" />
+
+                        </LinearLayout>
+
+                        <!-- CONTENIDO COLAPSABLE -->
+                        <LinearLayout
+                            android:id="@+id/contentNotas"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="16dp"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:id="@+id/txtNotas"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textColor="#E8F5E9"
+                                android:textSize="14sp"
+                                android:lineSpacingExtra="4dp" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 

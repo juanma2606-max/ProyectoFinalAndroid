@@ -75,24 +75,42 @@ public class PlantaDetalleActivity extends AppCompatActivity {
                 txtEstacion.setText("Estación: " + planta.estacion);
                 txtAbono.setText("Abono recomendado: " + planta.abono);
                 txtRiego.setText("Riego: " + planta.riego);
-                txtTiempo.setText("Tiempo de crecimiento: " + planta.tiempoCrecimiento);
+                txtTiempo.setText("Tiempo de crecimiento: " + planta.tiempo_crecimiento);
 
                 // Carga imagen según tipo de planta
                 cargarImagenPorTipo(imgPlanta, planta.tipo);
 
+                // Incompatibilidades - verificar null
                 listIncompatibilidades.removeAllViews();
-                for (String item : planta.incompatibilidades) {
+                if (planta.incompatibilidades != null) {
+                    for (String item : planta.incompatibilidades) {
+                        TextView t = new TextView(PlantaDetalleActivity.this);
+                        t.setText("• " + item);
+                        t.setTextSize(16);
+                        listIncompatibilidades.addView(t);
+                    }
+                } else {
                     TextView t = new TextView(PlantaDetalleActivity.this);
-                    t.setText(item);
-                    t.setTextSize(16);
+                    t.setText("Sin incompatibilidades registradas");
+                    t.setTextSize(14);
+                    t.setAlpha(0.6f);
                     listIncompatibilidades.addView(t);
                 }
 
+                // Plagas/Amenazas - verificar null
                 listPlagas.removeAllViews();
-                for (String plaga : planta.plagas) {
+                if (planta.amenazas != null) {
+                    for (String plaga : planta.amenazas) {
+                        TextView t = new TextView(PlantaDetalleActivity.this);
+                        t.setText("• " + plaga);
+                        t.setTextSize(16);
+                        listPlagas.addView(t);
+                    }
+                } else {
                     TextView t = new TextView(PlantaDetalleActivity.this);
-                    t.setText("• " + plaga);
-                    t.setTextSize(16);
+                    t.setText("Sin amenazas registradas");
+                    t.setTextSize(14);
+                    t.setAlpha(0.6f);
                     listPlagas.addView(t);
                 }
             }

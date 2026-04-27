@@ -29,13 +29,10 @@ public class CultivoDAO {
         auth = FirebaseAuth.getInstance();
     }
 
-    // ---------------------------------------------------------
-    // Ruta base: usuarios/{uid}/huertos/{huertoId}/cultivos
-    // ---------------------------------------------------------
     private DatabaseReference getCultivosRef(String huertoId) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) return null;
-        return database.getReference("usuarios")
+        return database.getReference("users")
                 .child(user.getUid())
                 .child("huertos")
                 .child(huertoId)
@@ -43,25 +40,19 @@ public class CultivoDAO {
     }
 
     private DatabaseReference getCultivosRefForUser(String uid, String huertoId) {
-        return database.getReference("usuarios")
+        return database.getReference("users")
                 .child(uid)
                 .child("huertos")
                 .child(huertoId)
                 .child("cultivos");
     }
 
-    // ---------------------------------------------------------
-    // Escucha en tiempo real los cultivos de un huerto
-    // ---------------------------------------------------------
     public void getCultivosByHuerto(String huertoId, ValueEventListener listener) {
         DatabaseReference ref = getCultivosRef(huertoId);
         if (ref == null) return;
         ref.addValueEventListener(listener);
     }
 
-    // ---------------------------------------------------------
-    // Obtener cultivos con callback
-    // ---------------------------------------------------------
     public void getCultivosByHuertoOnce(String huertoId, OnCultivosLoadedCallback callback) {
         DatabaseReference ref = getCultivosRef(huertoId);
         if (ref == null) {
@@ -90,9 +81,6 @@ public class CultivoDAO {
         });
     }
 
-    // ---------------------------------------------------------
-    // Obtener cultivos de otro usuario (para admin)
-    // ---------------------------------------------------------
     public void getCultivosByUserAndHuerto(String uid, String huertoId,
                                            OnCultivosLoadedCallback callback) {
         DatabaseReference ref = getCultivosRefForUser(uid, huertoId);
@@ -118,9 +106,6 @@ public class CultivoDAO {
         });
     }
 
-    // ---------------------------------------------------------
-    // Obtener un cultivo por ID
-    // ---------------------------------------------------------
     public void getCultivoById(String huertoId, String cultivoId, OnCultivoLoadedCallback callback) {
         DatabaseReference ref = getCultivosRef(huertoId);
         if (ref == null) {
@@ -147,18 +132,12 @@ public class CultivoDAO {
         });
     }
 
-    // ---------------------------------------------------------
-    // Detener escucha en tiempo real
-    // ---------------------------------------------------------
     public void removeListener(String huertoId, ValueEventListener listener) {
         DatabaseReference ref = getCultivosRef(huertoId);
         if (ref == null) return;
         ref.removeEventListener(listener);
     }
 
-    // ---------------------------------------------------------
-    // Crear un cultivo en un huerto
-    // ---------------------------------------------------------
     public void createCultivo(String huertoId, Cultivo cultivo, OnCompleteCallback callback) {
         DatabaseReference ref = getCultivosRef(huertoId);
         if (ref == null) {
@@ -177,7 +156,6 @@ public class CultivoDAO {
         data.put("estado", cultivo.getEstado() != null ? cultivo.getEstado() : "plantado");
         data.put("notas", cultivo.getNotas() != null ? cultivo.getNotas() : "");
 
-        // amenazaId solo si existe
         if (cultivo.getAmenazaId() != null && !cultivo.getAmenazaId().isEmpty()) {
             data.put("amenazaId", cultivo.getAmenazaId());
         }
@@ -187,9 +165,6 @@ public class CultivoDAO {
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
-    // ---------------------------------------------------------
-    // Actualizar un cultivo completo
-    // ---------------------------------------------------------
     public void updateCultivo(String huertoId, Cultivo cultivo, OnCompleteCallback callback) {
         DatabaseReference ref = getCultivosRef(huertoId);
         if (ref == null) {
@@ -203,7 +178,6 @@ public class CultivoDAO {
         data.put("estado", cultivo.getEstado());
         data.put("notas", cultivo.getNotas());
 
-        // amenazaId solo si existe
         if (cultivo.getAmenazaId() != null && !cultivo.getAmenazaId().isEmpty()) {
             data.put("amenazaId", cultivo.getAmenazaId());
         } else {
@@ -215,9 +189,6 @@ public class CultivoDAO {
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
-    // ---------------------------------------------------------
-    // Cambiar solo el estado de un cultivo
-    // ---------------------------------------------------------
     public void updateEstado(String huertoId, String cultivoId, String nuevoEstado,
                              OnCompleteCallback callback) {
         DatabaseReference ref = getCultivosRef(huertoId);
@@ -231,9 +202,6 @@ public class CultivoDAO {
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
-    // ---------------------------------------------------------
-    // Marcar cultivo como enfermo con amenaza
-    // ---------------------------------------------------------
     public void marcarEnfermo(String huertoId, String cultivoId, String amenazaId,
                               OnCompleteCallback callback) {
         DatabaseReference ref = getCultivosRef(huertoId);
@@ -251,9 +219,6 @@ public class CultivoDAO {
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
-    // ---------------------------------------------------------
-    // Curar cultivo (quitar amenaza)
-    // ---------------------------------------------------------
     public void curarCultivo(String huertoId, String cultivoId, OnCompleteCallback callback) {
         DatabaseReference ref = getCultivosRef(huertoId);
         if (ref == null) {
@@ -270,9 +235,6 @@ public class CultivoDAO {
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
-    // ---------------------------------------------------------
-    // Eliminar un cultivo
-    // ---------------------------------------------------------
     public void removeCultivo(String huertoId, String cultivoId, OnCompleteCallback callback) {
         DatabaseReference ref = getCultivosRef(huertoId);
         if (ref == null) {
@@ -285,13 +247,6 @@ public class CultivoDAO {
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
-    // ---------------------------------------------------------
-    // FILTROS
-    // ---------------------------------------------------------
-
-    /**
-     * Filtrar cultivos por estado
-     */
     public List<Cultivo> filtrarPorEstado(List<Cultivo> cultivos, String estado) {
         if (estado == null || estado.isEmpty()) return new ArrayList<>(cultivos);
 
@@ -304,9 +259,6 @@ public class CultivoDAO {
         return resultado;
     }
 
-    /**
-     * Obtener solo cultivos activos (no cosechados)
-     */
     public List<Cultivo> getCultivosActivos(List<Cultivo> cultivos) {
         List<Cultivo> resultado = new ArrayList<>();
         for (Cultivo c : cultivos) {
@@ -317,9 +269,6 @@ public class CultivoDAO {
         return resultado;
     }
 
-    /**
-     * Obtener solo cultivos enfermos
-     */
     public List<Cultivo> getCultivosEnfermos(List<Cultivo> cultivos) {
         List<Cultivo> resultado = new ArrayList<>();
         for (Cultivo c : cultivos) {
@@ -330,9 +279,6 @@ public class CultivoDAO {
         return resultado;
     }
 
-    // ---------------------------------------------------------
-    // Callbacks
-    // ---------------------------------------------------------
     public interface OnCompleteCallback {
         void onSuccess();
         void onError(String message);

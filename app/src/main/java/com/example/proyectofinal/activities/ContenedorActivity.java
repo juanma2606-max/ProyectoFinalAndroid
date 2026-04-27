@@ -44,7 +44,12 @@ public class ContenedorActivity extends AppCompatActivity {
                 fragment = new HomeFragment();
             } else if (id == R.id.nav_plantas) {
                 fragment = new PlantaFragment();
-            } else if (id == R.id.nav_amenazas) {
+
+            } else if (id == R.id.nav_chat) {
+                Intent i = new Intent(this, ChatActivity.class);
+                startActivity(i);
+                return true;
+            }else if (id == R.id.nav_amenazas) {
                 fragment = new AmenazaFragment();
             }else if (id == R.id.nav_ajustes) {
                 fragment = new AjustesFragment();

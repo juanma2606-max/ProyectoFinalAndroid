@@ -24,18 +24,15 @@ import com.example.proyectofinal.modelos.Cultivo;
 import com.example.proyectofinal.modelos.Planta;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class AgregarCultivoActivity extends AppCompatActivity {
+public class EditarCultivoActivity extends AppCompatActivity {
 
     private RecyclerView rvPlantas;
     private TextInputEditText etNombre;
@@ -59,6 +56,8 @@ public class AgregarCultivoActivity extends AppCompatActivity {
     private final List<Amenaza> listaAmenazas = new ArrayList<>();
     private Planta plantaSeleccionada = null;
     private String huertoId;
+    private String cultivoId;
+    private Cultivo cultivoActual;
     private Calendar calendarioSeleccionado;
 
     @Override
@@ -66,37 +65,34 @@ public class AgregarCultivoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_agregar_cultivo);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle("Editar cultivo");
+        }
+
         plantaDAO = new PlantaDAO();
         cultivoDAO = new CultivoDAO();
         amenazaDAO = new AmenazaDAO();
         calendarioSeleccionado = Calendar.getInstance();
 
         huertoId = getIntent().getStringExtra("huertoId");
+        cultivoId = getIntent().getStringExtra("cultivoId");
 
-        // Inicializar vistas
-        rvPlantas = findViewById(R.id.rvPlantas);
-        etNombre = findViewById(R.id.etNombreCultivo);
-        etCantidad = findViewById(R.id.etCantidad);
-        etFechaSiembra = findViewById(R.id.etFechaSiembra);
-        etNotas = findViewById(R.id.etNotas);
-        rgEstado = findViewById(R.id.rgEstado);
-        btnGuardar = findViewById(R.id.btnGuardar);
-        btnCancelar = findViewById(R.id.btnCancelar);
+        if (huertoId == null || cultivoId == null) {
+            Toast.makeText(this, "Error: datos inválidos", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
-        // Selector amenazas
-        cardAmenazas = findViewById(R.id.cardAmenazas);
-        spinnerAmenazas = findViewById(R.id.spinnerAmenazas);
+        initViews();
+        cargarPlantas();
+        cargarAmenazas();
+        cargarCultivo();
 
-        // Configurar RecyclerView
-        rvPlantas.setLayoutManager(new GridLayoutManager(this, 3));
-
-        // Configurar fecha por defecto (hoy)
-        actualizarFechaUI();
-
-        // Configurar listeners
+        // Listeners
         etFechaSiembra.setOnClickListener(v -> mostrarDatePicker());
         btnCancelar.setOnClickListener(v -> finish());
-        btnGuardar.setOnClickListener(v -> guardarCultivo());
+        btnGuardar.setOnClickListener(v -> guardarCambios());
 
         // Listener cambio estado
         rgEstado.setOnCheckedChangeListener((group, checkedId) -> {
@@ -106,14 +102,28 @@ public class AgregarCultivoActivity extends AppCompatActivity {
                 cardAmenazas.setVisibility(View.GONE);
             }
         });
-
-        cargarPlantas();
-        cargarAmenazas();
     }
 
-    // ---------------------------------------------------------
-    // Carga amenazas desde Firebase
-    // ---------------------------------------------------------
+    private void initViews() {
+        rvPlantas = findViewById(R.id.rvPlantas);
+        etNombre = findViewById(R.id.etNombreCultivo);
+        etCantidad = findViewById(R.id.etCantidad);
+        etFechaSiembra = findViewById(R.id.etFechaSiembra);
+        etNotas = findViewById(R.id.etNotas);
+        rgEstado = findViewById(R.id.rgEstado);
+        btnGuardar = findViewById(R.id.btnGuardar);
+        btnCancelar = findViewById(R.id.btnCancelar);
+
+        cardAmenazas = findViewById(R.id.cardAmenazas);
+        spinnerAmenazas = findViewById(R.id.spinnerAmenazas);
+
+        // Configurar RecyclerView
+        rvPlantas.setLayoutManager(new GridLayoutManager(this, 3));
+
+        // Cambiar texto botón
+        btnGuardar.setText("Guardar cambios");
+    }
+
     private void cargarAmenazas() {
         amenazaDAO.getAllAmenazasOnce(new AmenazaDAO.OnAmenazasLoadedCallback() {
             @Override
@@ -121,16 +131,14 @@ public class AgregarCultivoActivity extends AppCompatActivity {
                 listaAmenazas.clear();
                 listaAmenazas.addAll(amenazas);
 
-                // Crear lista de nombres para Spinner
                 List<String> nombresAmenazas = new ArrayList<>();
                 nombresAmenazas.add("Seleccionar amenaza...");
                 for (Amenaza a : amenazas) {
                     nombresAmenazas.add(a.getNombre());
                 }
 
-                // Configurar Spinner
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                        AgregarCultivoActivity.this,
+                        EditarCultivoActivity.this,
                         android.R.layout.simple_spinner_item,
                         nombresAmenazas
                 );
@@ -140,15 +148,12 @@ public class AgregarCultivoActivity extends AppCompatActivity {
 
             @Override
             public void onError(Exception e) {
-                Toast.makeText(AgregarCultivoActivity.this,
+                Toast.makeText(EditarCultivoActivity.this,
                         "Error al cargar amenazas", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // ---------------------------------------------------------
-    // Carga el catálogo de plantas en RecyclerView
-    // ---------------------------------------------------------
     private void cargarPlantas() {
         plantaDAO.getAllPlantasOnce(new PlantaDAO.OnPlantasLoadedCallback() {
             @Override
@@ -157,7 +162,7 @@ public class AgregarCultivoActivity extends AppCompatActivity {
                 listaPlantas.addAll(plantas);
 
                 plantaAdapter = new PlantaSelectorAdapter(
-                        AgregarCultivoActivity.this,
+                        EditarCultivoActivity.this,
                         listaPlantas,
                         planta -> {
                             plantaSeleccionada = planta;
@@ -170,15 +175,127 @@ public class AgregarCultivoActivity extends AppCompatActivity {
 
             @Override
             public void onError(Exception e) {
-                Toast.makeText(AgregarCultivoActivity.this,
+                Toast.makeText(EditarCultivoActivity.this,
                         "Error al cargar plantas", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // ---------------------------------------------------------
-    // Mostrar DatePicker para seleccionar fecha
-    // ---------------------------------------------------------
+    private void cargarCultivo() {
+        cultivoDAO.getCultivoById(huertoId, cultivoId, new CultivoDAO.OnCultivoLoadedCallback() {
+            @Override
+            public void onLoaded(Cultivo cultivo) {
+                cultivoActual = cultivo;
+                mostrarDatos(cultivo);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(EditarCultivoActivity.this,
+                        "Error al cargar cultivo: " + e.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+    }
+
+    private void mostrarDatos(Cultivo cultivo) {
+        // Nombre
+        etNombre.setText(cultivo.getNombre());
+
+        // Cantidad
+        etCantidad.setText(String.valueOf(cultivo.getCantidad()));
+
+        // Notas
+        etNotas.setText(cultivo.getNotas());
+
+        // Fecha siembra
+        if (cultivo.getFechaSiembra() != null) {
+            parsearYMostrarFecha(cultivo.getFechaSiembra());
+        }
+
+        // Estado
+        seleccionarEstado(cultivo.getEstado());
+
+        // Amenaza (si enfermo)
+        if (cultivo.estaEnfermo() && cultivo.getAmenazaId() != null) {
+            cardAmenazas.setVisibility(View.VISIBLE);
+            seleccionarAmenaza(cultivo.getAmenazaId());
+        }
+
+        // Planta (marcar seleccionada cuando carguen)
+        if (listaPlantas.isEmpty()) {
+            // Esperar a que carguen plantas
+            plantaDAO.getAllPlantasOnce(new PlantaDAO.OnPlantasLoadedCallback() {
+                @Override
+                public void onLoaded(List<Planta> plantas) {
+                    for (Planta p : plantas) {
+                        if (p.getId().equals(cultivo.getPlantaId())) {
+                            plantaSeleccionada = p;
+                            if (plantaAdapter != null) {
+                                plantaAdapter.notifyDataSetChanged();
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {}
+            });
+        }
+    }
+
+    private void parsearYMostrarFecha(String fechaISO) {
+        try {
+            SimpleDateFormat sdfISO = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+            calendarioSeleccionado.setTime(sdfISO.parse(fechaISO));
+            actualizarFechaUI();
+        } catch (ParseException e) {
+            // Si falla, intentar solo la fecha
+            try {
+                if (fechaISO.length() >= 10) {
+                    String fecha = fechaISO.substring(0, 10);
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    calendarioSeleccionado.setTime(sdf.parse(fecha));
+                    actualizarFechaUI();
+                }
+            } catch (ParseException ex) {
+                etFechaSiembra.setText(fechaISO);
+            }
+        }
+    }
+
+    private void seleccionarEstado(String estado) {
+        switch (estado.toLowerCase()) {
+            case "plantado":
+                rgEstado.check(R.id.rbPlantado);
+                break;
+            case "creciendo":
+                rgEstado.check(R.id.rbCreciendo);
+                break;
+            case "maduro":
+                rgEstado.check(R.id.rbMaduro);
+                break;
+            case "cosechado":
+                rgEstado.check(R.id.rbCosechado);
+                break;
+            case "enfermo":
+                rgEstado.check(R.id.rbEnfermo);
+                cardAmenazas.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    private void seleccionarAmenaza(String amenazaId) {
+        for (int i = 0; i < listaAmenazas.size(); i++) {
+            if (listaAmenazas.get(i).getId().equals(amenazaId)) {
+                spinnerAmenazas.setSelection(i + 1); // +1 por placeholder
+                break;
+            }
+        }
+    }
+
     private void mostrarDatePicker() {
         int año = calendarioSeleccionado.get(Calendar.YEAR);
         int mes = calendarioSeleccionado.get(Calendar.MONTH);
@@ -196,42 +313,28 @@ public class AgregarCultivoActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    // ---------------------------------------------------------
-    // Actualizar campo de fecha en UI
-    // ---------------------------------------------------------
     private void actualizarFechaUI() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         etFechaSiembra.setText(sdf.format(calendarioSeleccionado.getTime()));
     }
 
-    // ---------------------------------------------------------
-    // Convertir fecha a formato ISO
-    // ---------------------------------------------------------
     private String getFechaISO() {
         SimpleDateFormat sdfISO = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
         return sdfISO.format(calendarioSeleccionado.getTime());
     }
 
-    // ---------------------------------------------------------
-    // Obtener amenazaId seleccionado
-    // ---------------------------------------------------------
     private String getAmenazaIdSeleccionada() {
         int posicion = spinnerAmenazas.getSelectedItemPosition();
 
-        // Posición 0 = "Seleccionar amenaza..." (placeholder)
         if (posicion <= 0 || posicion > listaAmenazas.size()) {
             return null;
         }
 
-        // Restar 1 porque el placeholder está en posición 0
         Amenaza amenaza = listaAmenazas.get(posicion - 1);
         return amenaza.getId();
     }
 
-    // ---------------------------------------------------------
-    // Guarda el cultivo en Firebase
-    // ---------------------------------------------------------
-    private void guardarCultivo() {
+    private void guardarCambios() {
         // Validar planta seleccionada
         if (plantaSeleccionada == null) {
             Toast.makeText(this, "Selecciona una planta", Toast.LENGTH_SHORT).show();
@@ -268,7 +371,6 @@ public class AgregarCultivoActivity extends AppCompatActivity {
                 : "";
 
         String estado = getEstadoSeleccionado();
-        String fechaISO = getFechaISO();
 
         // Obtener amenazaId si enfermo
         String amenazaId = null;
@@ -281,40 +383,33 @@ public class AgregarCultivoActivity extends AppCompatActivity {
             }
         }
 
-        // Crear objeto Cultivo
-        Cultivo nuevo = new Cultivo(
-                null,                       // id (Firebase lo genera)
-                nombre,                     // nombre
-                plantaSeleccionada.getId(), // plantaId
-                fechaISO,                   // fecha_siembra
-                cantidad,                   // cantidad
-                estado,                     // estado
-                amenazaId,                  // amenazaId
-                notas                       // notas
-        );
+        // Actualizar objeto
+        cultivoActual.setNombre(nombre);
+        cultivoActual.setPlantaId(plantaSeleccionada.getId());
+        cultivoActual.setCantidad(cantidad);
+        cultivoActual.setEstado(estado);
+        cultivoActual.setNotas(notas);
+        cultivoActual.setAmenazaId(amenazaId);
 
         btnGuardar.setEnabled(false);
 
-        cultivoDAO.createCultivo(huertoId, nuevo, new CultivoDAO.OnCompleteCallback() {
+        cultivoDAO.updateCultivo(huertoId, cultivoActual, new CultivoDAO.OnCompleteCallback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(AgregarCultivoActivity.this,
-                        "Cultivo añadido ✅", Toast.LENGTH_SHORT).show();
+                Toast.makeText(EditarCultivoActivity.this,
+                        "Cultivo actualizado ✅", Toast.LENGTH_SHORT).show();
                 finish();
             }
 
             @Override
             public void onError(String message) {
                 btnGuardar.setEnabled(true);
-                Toast.makeText(AgregarCultivoActivity.this,
+                Toast.makeText(EditarCultivoActivity.this,
                         "Error: " + message, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // ---------------------------------------------------------
-    // Lee el estado seleccionado en el RadioGroup
-    // ---------------------------------------------------------
     private String getEstadoSeleccionado() {
         int checkedId = rgEstado.getCheckedRadioButtonId();
 
@@ -329,7 +424,13 @@ public class AgregarCultivoActivity extends AppCompatActivity {
         } else if (checkedId == R.id.rbEnfermo) {
             return "enfermo";
         } else {
-            return "plantado"; // Por defecto
+            return "plantado";
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 }
