@@ -4,9 +4,7 @@
         <item>arcilloso</item>
         <item>franco</item>
         <item>limoso</item>
-        <item>pedregoso</item>
-        <item>humífero</item>
-        <item>mixto</item>
+
     </string-array>
     <string name="app_name">Huerting</string>
     <string name="detalle_planta">Detalle de planta</string>
@@ -24,4 +22,5 @@
     <string name="imagen_planta">Imagen de la planta</string>
     <string name="imagen_amenaza">Imagen de la amenaza</string>
     <string name="imagen_huerto">Imagen del huerto</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>
