@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.proyectofinal.R;
 import com.example.proyectofinal.modelos.Planta;
 import com.example.proyectofinal.dao.PlantaDAO;
+import com.example.proyectofinal.utils.IconosHelper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -78,7 +79,7 @@ public class PlantaDetalleActivity extends AppCompatActivity {
                 txtTiempo.setText("Tiempo de crecimiento: " + planta.tiempo_crecimiento);
 
                 // Carga imagen según tipo de planta
-                cargarImagenPorTipo(imgPlanta, planta.tipo);
+                cargarImagen(planta.imagen, planta.tipo);
 
                 // Incompatibilidades - verificar null
                 listIncompatibilidades.removeAllViews();
@@ -120,21 +121,47 @@ public class PlantaDetalleActivity extends AppCompatActivity {
         });
     }
 
-    private void cargarImagenPorTipo(ImageView imgView, String tipo) {
-        String nombreArchivo;
-        switch (tipo != null ? tipo : "") {
-            case "arbol":     nombreArchivo = "manzano.webp"; break;
-            case "hierba":    nombreArchivo = "romero.webp";  break;
-            case "flor":      nombreArchivo = "rosas.webp";   break;
-            case "hortaliza": nombreArchivo = "tomates.webp"; break;
-            case "fruta":     nombreArchivo = "sandias.webp"; break;
-            default:          nombreArchivo = "tomates.webp"; break;
+    /**
+     * Cargar imagen desde URL o mostrar color fallback
+     */
+    private void cargarImagen(String urlImagen, String tipo) {
+        // Si no tiene URL, mostrar color inmediatamente
+        if (urlImagen == null || urlImagen.isEmpty()) {
+            mostrarColorFallback(tipo);
+            return;
         }
 
+        // Intentar cargar la imagen
         Picasso.get()
-                .load("file:///android_asset/" + nombreArchivo)
+                .load(urlImagen)
                 .placeholder(R.drawable.ic_launcher_background)
-                .error(R.drawable.ic_launcher_background)
-                .into(imgView);
+                .into(imgPlanta, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        // Imagen cargada - limpiar el fondo de color
+                        imgPlanta.setBackgroundColor(0x00000000); // Transparente
+                        imgPlanta.setPadding(0, 0, 0, 0);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        // Error al cargar - mostrar color fallback
+                        mostrarColorFallback(tipo);
+                    }
+                });
+    }
+
+    /**
+     * Mostrar fondo de color sin icono
+     */
+    private void mostrarColorFallback(String tipo) {
+        // Limpiar la imagen (sin icono)
+        imgPlanta.setImageDrawable(null);
+
+        // Solo aplicar el color de fondo
+        imgPlanta.setBackgroundColor(IconosHelper.getColorPlanta(tipo));
+
+        // Sin padding
+        imgPlanta.setPadding(0, 0, 0, 0);
     }
 }

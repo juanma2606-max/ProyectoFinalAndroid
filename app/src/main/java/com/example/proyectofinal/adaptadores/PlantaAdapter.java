@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyectofinal.R;
 import com.example.proyectofinal.modelos.Planta;
+import com.example.proyectofinal.utils.IconosHelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -78,18 +79,8 @@ public class PlantaAdapter extends RecyclerView.Adapter<PlantaAdapter.PlantaView
             holder.txtLuz.setText(emojiLuz + " " + (p.getLuz() != null ? p.getLuz() : "-"));
         }
 
-        // Imagen
-        if (p.getImagen() != null && !p.getImagen().isEmpty()) {
-            // Cargar desde URL (Firebase)
-            Picasso.get()
-                    .load(p.getImagen())
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .error(R.drawable.ic_launcher_background)
-                    .into(holder.imgPlanta);
-        } else {
-            // Fallback: imagen según tipo desde assets
-            cargarImagenPorTipo(holder.imgPlanta, p.getTipo());
-        }
+        //Cargar imagen con fallback
+        cargarImagen(holder.imgPlanta, p.getImagen(), p.getTipo());
 
         holder.itemView.setOnClickListener(v -> listener.onClick(p));
     }
@@ -121,37 +112,49 @@ public class PlantaAdapter extends RecyclerView.Adapter<PlantaAdapter.PlantaView
         }
     }
 
-    // ---------------------------------------------------------
-    // Imagen según tipo de planta desde assets (fallback)
-    // ---------------------------------------------------------
-    private void cargarImagenPorTipo(ImageView imgView, String tipo) {
-        String nombreArchivo;
-        switch (tipo != null ? tipo : "") {
-            case "arbol":
-                nombreArchivo = "manzano.webp";
-                break;
-            case "hierba":
-                nombreArchivo = "romero.webp";
-                break;
-            case "flor":
-                nombreArchivo = "rosas.webp";
-                break;
-            case "hortaliza":
-                nombreArchivo = "tomates.webp";
-                break;
-            case "fruta":
-                nombreArchivo = "sandias.webp";
-                break;
-            default:
-                nombreArchivo = "tomates.webp";
-                break;
+    /**
+     * Cargar imagen desde URL o mostrar color fallback
+     */
+    private void cargarImagen(ImageView imgView, String urlImagen, String tipo) {
+        // Si no tiene URL, mostrar color inmediatamente
+        if (urlImagen == null || urlImagen.isEmpty()) {
+            mostrarColorFallback(imgView, tipo);
+            return;
         }
 
+        // Intentar cargar la imagen
         Picasso.get()
-                .load("file:///android_asset/" + nombreArchivo)
+                .load(urlImagen)
                 .placeholder(R.drawable.ic_launcher_background)
-                .error(R.drawable.ic_launcher_background)
-                .into(imgView);
+                .into(imgView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        // Imagen cargada - limpiar el fondo de color
+                        imgView.setBackgroundColor(0x00000000); // Transparente
+                        imgView.setPadding(0, 0, 0, 0);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        // Error al cargar - mostrar color fallback
+                        mostrarColorFallback(imgView, tipo);
+                    }
+                });
+    }
+
+    /**
+     * Mostrar fondo de color sin icono
+     */
+    private void mostrarColorFallback(ImageView imgView, String tipo) {
+        // Limpiar la imagen (sin icono)
+        imgView.setImageDrawable(null);
+
+        // Solo aplicar el color de fondo
+        imgView.setBackgroundColor(IconosHelper.getColorPlanta(tipo));
+        imgView.setBackgroundColor(IconosHelper.getColorPlanta(tipo));
+
+        // Sin padding
+        imgView.setPadding(0, 0, 0, 0);
     }
 
     // ---------------------------------------------------------

@@ -31,11 +31,6 @@
             android:name=".fragments.AjustesFragment"
             android:exported="false" />
 
-        <service
-            android:name=".MusicService"
-            android:enabled="true"
-            android:exported="false" />
-
         <activity
             android:name=".activities.AgregarCultivoActivity"
             android:exported="false" />

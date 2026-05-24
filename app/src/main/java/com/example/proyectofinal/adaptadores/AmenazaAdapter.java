@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyectofinal.R;
 import com.example.proyectofinal.modelos.Amenaza;
+import com.example.proyectofinal.utils.IconosHelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -46,7 +47,8 @@ public class AmenazaAdapter extends RecyclerView.Adapter<AmenazaAdapter.AmenazaV
         holder.txtNombre.setText(a.nombre);
         holder.txtTipo.setText("plaga".equals(a.tipo) ? "🐛 Plaga" : "🦠 Enfermedad");
 
-        cargarImagenPorTipo(holder.imgAmenaza, a.tipo);
+        //Cargar imagen con fallback
+        cargarImagen(holder.imgAmenaza, a.imagen, a.tipo);
 
         holder.itemView.setOnClickListener(v -> listener.onClick(a));
     }
@@ -61,19 +63,43 @@ public class AmenazaAdapter extends RecyclerView.Adapter<AmenazaAdapter.AmenazaV
         notifyDataSetChanged();
     }
 
-    private void cargarImagenPorTipo(ImageView imgView, String tipo) {
-        String nombreArchivo;
-        switch (tipo != null ? tipo : "") {
-            case "plaga":       nombreArchivo = "pulgon.webp"; break;
-            case "enfermedad":  nombreArchivo = "mildiu.webp"; break;
-            default:            nombreArchivo = "plaga_generico.webp"; break;
+    /**
+     * Cargar imagen desde URL o mostrar icono fallback
+     */
+    private void cargarImagen(ImageView imgView, String urlImagen, String tipo) {
+        // Si no tiene URL, mostrar icono inmediatamente
+        if (urlImagen == null || urlImagen.isEmpty()) {
+            mostrarIconoFallback(imgView, tipo);
+            return;
         }
 
+        // Intentar cargar la imagen
         Picasso.get()
-                .load("file:///android_asset/" + nombreArchivo)
+                .load(urlImagen)
                 .placeholder(R.drawable.ic_launcher_background)
-                .error(R.drawable.ic_launcher_background)
-                .into(imgView);
+                .into(imgView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        // Imagen cargada - limpiar el fondo de color
+                        imgView.setBackgroundColor(0x00000000); // Transparente
+                        imgView.setPadding(0, 0, 0, 0);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        // Error al cargar - mostrar icono fallback
+                        mostrarIconoFallback(imgView, tipo);
+                    }
+                });
+    }
+
+    /**
+     * Mostrar icono fallback según tipo
+     */
+    private void mostrarIconoFallback(ImageView imgView, String tipo) {
+        imgView.setImageResource(IconosHelper.getIconoAmenaza(tipo));
+        imgView.setBackgroundColor(IconosHelper.getColorAmenaza(tipo));
+        imgView.setPadding(16, 16, 16, 16);
     }
 
     static class AmenazaViewHolder extends RecyclerView.ViewHolder {

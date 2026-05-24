@@ -24,7 +24,7 @@ public class User {
         this.admin = false;
         this.baneado = false;
         this.motivoBaneo = null;
-        this.fotoPerfil = "avatar2.webp"; // Foto por defecto (actualizada de perfil1.png)
+        this.fotoPerfil = "avatar1.webp"; // Foto por defecto (actualizada de perfil1.png)
     }
 
     // Constructor completo
@@ -35,7 +35,7 @@ public class User {
         this.admin = admin != null ? admin : false;
         this.baneado = baneado != null ? baneado : false;
         this.motivoBaneo = motivoBaneo;
-        this.fotoPerfil = "avatar2.webp"; // Foto por defecto (actualizada de perfil1.png)
+        this.fotoPerfil = "avatar1.webp"; // Foto por defecto (actualizada de perfil1.png)
     }
 
     // Getters

@@ -138,10 +138,18 @@ public class AjustesFragment extends Fragment {
     private void cargarFotoPerfil(String foto) {
         if (!isAdded() || getContext() == null) return;
 
+        // Si la foto viene vacía, nula, o tiene "perfil", usar default
         if (foto == null || foto.isEmpty() || foto.contains("perfil")) {
             foto = "avatar2.webp";
         }
 
+        // Limpiar el nombre: si tiene /, extraer solo el nombre del archivo
+        if (foto.contains("/")) {
+            String[] partes = foto.split("/");
+            foto = partes[partes.length - 1];
+        }
+
+        // Quitar extensión para buscar en drawable
         String nombreSinExtension = foto.replace(".webp", "").replace(".png", "").replace(".jpg", "");
         int resId = getResources().getIdentifier(nombreSinExtension, "drawable", getContext().getPackageName());
 

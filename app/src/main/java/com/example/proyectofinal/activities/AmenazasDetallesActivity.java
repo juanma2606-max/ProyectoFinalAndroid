@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.proyectofinal.R;
 import com.example.proyectofinal.modelos.Amenaza;
 import com.example.proyectofinal.dao.AmenazaDAO;
+import com.example.proyectofinal.utils.IconosHelper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -61,6 +62,7 @@ public class AmenazasDetallesActivity extends AppCompatActivity {
     }
 
     private void cargarAmenaza(String id) {
+
         amenazaService.getAmenazaById(id, new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -105,8 +107,8 @@ public class AmenazasDetallesActivity extends AppCompatActivity {
                     findViewById(R.id.lblSintomas).setVisibility(android.view.View.GONE);
                 }
 
-                // Carga imagen según tipo de amenaza
-                cargarImagenPorTipo(imgAmenaza, amenaza.tipo);
+                // Carga imagen
+                cargarImagen(amenaza);
             }
 
             @Override
@@ -114,18 +116,45 @@ public class AmenazasDetallesActivity extends AppCompatActivity {
         });
     }
 
-    private void cargarImagenPorTipo(ImageView imgView, String tipo) {
-        String nombreArchivo;
-        switch (tipo != null ? tipo : "") {
-            case "plaga":       nombreArchivo = "pulgon.webp"; break;
-            case "enfermedad":  nombreArchivo = "mildiu.webp"; break;
-            default:            nombreArchivo = "plaga_generico.webp"; break;
+    /**
+     * Cargar imagen desde Firebase o mostrar icono fallback
+     */
+    private void cargarImagen(Amenaza amenaza) {
+        String urlImagen = amenaza.imagen;
+
+        // Si no tiene URL, mostrar icono inmediatamente
+        if (urlImagen == null || urlImagen.isEmpty()) {
+            mostrarIconoFallback(amenaza.tipo);
+            return;
         }
 
+        // Intentar cargar la imagen
         Picasso.get()
-                .load("file:///android_asset/" + nombreArchivo)
+                .load(urlImagen)
                 .placeholder(R.drawable.ic_launcher_background)
-                .error(R.drawable.ic_launcher_background)
-                .into(imgView);
+                .into(imgAmenaza, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        // Imagen cargada - limpiar el fondo de color
+                        imgAmenaza.setBackgroundColor(0x00000000); // Transparente
+                        imgAmenaza.setPadding(0, 0, 0, 0);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        // Error al cargar - mostrar icono fallback
+                        mostrarIconoFallback(amenaza.tipo);
+                    }
+                });
     }
-}
+
+    /**
+     * Mostrar icono fallback según tipo
+     */
+    private void mostrarIconoFallback(String tipo) {
+        imgAmenaza.setImageResource(IconosHelper.getIconoAmenaza(tipo));
+        imgAmenaza.setBackgroundColor(IconosHelper.getColorAmenaza(tipo));
+        imgAmenaza.setPadding(16, 16, 16, 16);
+    }
+
+    }

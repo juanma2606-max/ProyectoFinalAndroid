@@ -26,6 +26,23 @@ public class UserDAO {
     }
 
     // ---------------------------------------------------------
+// Limpiar nombre de foto (solo el nombre del archivo)
+// ---------------------------------------------------------
+    private String limpiarNombreFoto(String foto) {
+        if (foto == null || foto.isEmpty()) {
+            return "avatar2.webp";
+        }
+
+        // Si tiene path, extraer solo el nombre
+        if (foto.contains("/")) {
+            String[] partes = foto.split("/");
+            return partes[partes.length - 1];
+        }
+
+        return foto;
+    }
+
+    // ---------------------------------------------------------
     // Referencia al perfil del usuario
     // ---------------------------------------------------------
     private DatabaseReference getProfileRef(String uid) {
@@ -137,11 +154,14 @@ public class UserDAO {
     }
 
     // ---------------------------------------------------------
-    // Actualizar foto de perfil
-    // ---------------------------------------------------------
+// Actualizar foto de perfil
+// ---------------------------------------------------------
     public void updateProfilePhoto(String uid, String foto, OnOperationCallback callback) {
+        // Limpiar el nombre de la foto (solo guardar el nombre del archivo)
+        String nombreFotoLimpio = limpiarNombreFoto(foto);
+
         Map<String, Object> updates = new HashMap<>();
-        updates.put("fotoPerfil", foto);
+        updates.put("fotoPerfil", nombreFotoLimpio);
 
         getProfileRef(uid).updateChildren(updates)
                 .addOnSuccessListener(aVoid -> callback.onSuccess())
