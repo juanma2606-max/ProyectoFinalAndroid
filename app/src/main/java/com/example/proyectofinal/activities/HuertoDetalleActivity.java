@@ -107,8 +107,8 @@ public class HuertoDetalleActivity extends AppCompatActivity {
         btnAnalizarHuerto = findViewById(R.id.btnAnalizarHuerto);
 
         recyclerCultivos.setLayoutManager(new LinearLayoutManager(this));
-        recyclerCultivos.setHasFixedSize(false);        // ← AÑADIR
-        recyclerCultivos.setNestedScrollingEnabled(false); // ← AÑADIR
+        recyclerCultivos.setNestedScrollingEnabled(false);
+        recyclerCultivos.setHasFixedSize(false);
         cultivoAdapter = new CultivoAdapter(this, cultivos, new CultivoAdapter.OnCultivoActionListener() {
             @Override
             public void onEditar(Cultivo cultivo) {
@@ -140,11 +140,12 @@ public class HuertoDetalleActivity extends AppCompatActivity {
         ImageButton btnEditar = findViewById(R.id.btnEditarHuerto);
         if (btnEditar != null) {
             btnEditar.setOnClickListener(v -> {
-                Intent i = new Intent(this, EditarHuertoActivity.class);
+                Intent i = new Intent(HuertoDetalleActivity.this, EditarHuertoActivity.class);
                 i.putExtra("huertoId", huertoId);
                 startActivity(i);
             });
         }
+
         // FAB agregar cultivo
         FloatingActionButton fab = findViewById(R.id.fabAgregarCultivo);
         if (fab != null) {
@@ -301,14 +302,11 @@ public class HuertoDetalleActivity extends AppCompatActivity {
                         cultivos.add(c);
                     }
                 }
-
-                List<String> plantaIds = new ArrayList<>();
+                List<String> ids = new ArrayList<>();
                 for (Cultivo c : cultivos) {
-                    if (c.getPlantaId() != null) {
-                        plantaIds.add(c.getPlantaId());
-                    }
+                    ids.add(c.getPlantaId());
                 }
-                cultivoAdapter.setPlantasEnHuerto(plantaIds);
+                cultivoAdapter.setPlantasEnHuerto(ids);
                 cultivoAdapter.updateList(cultivos);
 
                 if (cultivos.isEmpty()) {

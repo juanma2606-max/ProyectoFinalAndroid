@@ -86,7 +86,6 @@ public class AgregarHuertoActivity extends AppCompatActivity {
 
         // Valores por defecto
         etHorasSol.setText("6");
-        etSuperficie.setText("10.0");
 
         // Configurar selector de fotos
         configurarSelectorFotos();

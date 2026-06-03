@@ -144,6 +144,11 @@ public class EditarCultivoActivity extends AppCompatActivity {
                 );
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerAmenazas.setAdapter(adapter);
+                // Restaurar amenaza si el cultivo ya estaba cargado
+                if (cultivoActual != null && cultivoActual.estaEnfermo()
+                        && cultivoActual.getAmenazaId() != null) {
+                    seleccionarAmenaza(cultivoActual.getAmenazaId());
+                }
             }
 
             @Override

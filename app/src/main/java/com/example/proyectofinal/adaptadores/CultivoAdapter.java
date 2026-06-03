@@ -12,7 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyectofinal.R;
+import com.example.proyectofinal.dao.AmenazaDAO;
 import com.example.proyectofinal.dao.PlantaDAO;
+import com.example.proyectofinal.modelos.Amenaza;
 import com.example.proyectofinal.modelos.Cultivo;
 import com.example.proyectofinal.modelos.Planta;
 import com.google.firebase.database.DataSnapshot;
@@ -36,6 +38,7 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
     private final PlantaDAO plantaDAO;
     private List<String> todasLasPlantasIds = new ArrayList<>();
 
+
     public CultivoAdapter(Context context, List<Cultivo> lista, OnCultivoActionListener listener) {
         this.context = context;
         this.lista = lista;
@@ -45,11 +48,6 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
 
     public void updateList(List<Cultivo> nuevaLista) {
         this.lista = nuevaLista;
-        notifyDataSetChanged();
-    }
-
-    public void setPlantasEnHuerto(List<String> plantasIds) {
-        this.todasLasPlantasIds = plantasIds;
         notifyDataSetChanged();
     }
 
@@ -75,12 +73,17 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
 
         // Warning si enfermo
         if (holder.iconWarning != null) {
-            holder.iconWarning.setVisibility(cultivo.estaEnfermo() ? View.VISIBLE : View.GONE);
+            if (cultivo.estaEnfermo()) {
+                holder.iconWarning.setVisibility(View.VISIBLE);
+            } else {
+                holder.iconWarning.setVisibility(View.GONE);
+            }
         }
 
         // Fecha siembra
         if (holder.txtFechaSiembra != null && cultivo.getFechaSiembra() != null) {
-            holder.txtFechaSiembra.setText("Sembrado: " + formatearFecha(cultivo.getFechaSiembra()));
+            String fecha = formatearFecha(cultivo.getFechaSiembra());
+            holder.txtFechaSiembra.setText("Sembrado: " + fecha);
         }
 
         // Notas
@@ -93,20 +96,17 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
             }
         }
 
-        // Cancelar listener anterior si existe
-        if (holder.plantaListener != null && holder.ultimoPlantaId != null) {
-            plantaDAO.removeListener(holder.ultimoPlantaId, holder.plantaListener);
-        }
-
-        holder.ultimoPlantaId = cultivo.getPlantaId();
-        holder.plantaListener = new ValueEventListener() {
+        // Consulta secundaria a PlantaDAO para obtener datos de la planta
+        plantaDAO.getPlantaById(cultivo.getPlantaId(), new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Planta planta = snapshot.getValue(Planta.class);
                 if (planta == null) return;
 
+                // Nombre planta
                 holder.txtNombrePlanta.setText(planta.getNombre());
 
+                // Cargar imagen de la planta
                 if (planta.getImagen() != null && !planta.getImagen().isEmpty()) {
                     Picasso.get()
                             .load(planta.getImagen())
@@ -116,68 +116,54 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
                 } else {
                     cargarImagenPorTipo(holder.imgCultivo, planta.getTipo());
                 }
-
-                // INCOMPATIBILIDADES — en ambas direcciones
-                if (holder.txtIncompatibilidades != null) {
-                    List<String> incomps = planta.getIncompatibilidades();
-                    String miPlantaId = cultivo.getPlantaId();
-
-                    // IDs conflictivos: los que yo tengo en mi lista Y los que me tienen a mí
-                    List<String> conflictosIds = new ArrayList<>();
-
-                    // Dirección 1: yo soy incompatible con otras plantas del huerto
-                    if (incomps != null) {
-                        for (String incompId : incomps) {
-                            if (todasLasPlantasIds.contains(incompId) && !conflictosIds.contains(incompId)) {
-                                conflictosIds.add(incompId);
-                            }
-                        }
-                    }
-
-                    // Dirección 2: otras plantas del huerto son incompatibles conmigo
-                    // Necesitamos cargar cada planta del huerto y ver si me tienen en su lista
-                    final List<String> conflictosFinal = new ArrayList<>(conflictosIds);
-                    final int[] pendientesCheck = {todasLasPlantasIds.size()};
-
-                    if (todasLasPlantasIds.isEmpty()) {
-                        holder.txtIncompatibilidades.setVisibility(View.GONE);
-                        return;
-                    }
-
-                    for (String otraPlantaId : todasLasPlantasIds) {
-                        if (otraPlantaId.equals(miPlantaId)) {
-                            pendientesCheck[0]--;
-                            if (pendientesCheck[0] == 0) mostrarConflictos(holder, conflictosFinal);
-                            continue;
-                        }
-                        plantaDAO.getPlantaById(otraPlantaId, new PlantaDAO.OnPlantaLoadedCallback() {
-                            @Override
-                            public void onLoaded(Planta otraPlanta) {
-                                List<String> susIncomps = otraPlanta.getIncompatibilidades();
-                                if (susIncomps != null && susIncomps.contains(miPlantaId)) {
-                                    if (!conflictosFinal.contains(otraPlantaId)) {
-                                        conflictosFinal.add(otraPlantaId);
+                if (planta.getIncompatibilidades() != null && !planta.getIncompatibilidades().isEmpty()) {
+                    List<String> conflictos = new ArrayList<>();
+                    for (String incompId : planta.getIncompatibilidades()) {
+                        if (todasLasPlantasIds.contains(incompId)) {
+                            // Buscar nombre de la planta incompatible
+                            plantaDAO.getPlantaById(incompId, new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    Planta incomp = snapshot.getValue(Planta.class);
+                                    if (incomp != null) {
+                                        conflictos.add(incomp.getNombre());
+                                        holder.txtIncompatibilidades.setText(
+                                                "⚠ Incompatible con: " + android.text.TextUtils.join(", ", conflictos)
+                                        );
+                                        holder.txtIncompatibilidades.setVisibility(View.VISIBLE);
+                                        if (holder.iconWarning != null) {
+                                            holder.iconWarning.setVisibility(View.GONE);
+                                        }
                                     }
                                 }
-                                pendientesCheck[0]--;
-                                if (pendientesCheck[0] == 0) mostrarConflictos(holder, conflictosFinal);
-                            }
-                            @Override
-                            public void onError(Exception e) {
-                                pendientesCheck[0]--;
-                                if (pendientesCheck[0] == 0) mostrarConflictos(holder, conflictosFinal);
-                            }
-                        });
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {}
+                            });
+                        }
                     }
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 holder.txtNombrePlanta.setText("Planta desconocida");
             }
-        };
+        });
 
-        plantaDAO.getPlantaById(cultivo.getPlantaId(), holder.plantaListener);
+        // Mostrar nombre de amenaza si el cultivo está enfermo
+        if (cultivo.estaEnfermo() && cultivo.getAmenazaId() != null) {
+            AmenazaDAO amenazaDAO = new AmenazaDAO();
+            amenazaDAO.getAmenazaById(cultivo.getAmenazaId(), new AmenazaDAO.OnAmenazaLoadedCallback() {
+                @Override
+                public void onLoaded(Amenaza amenaza) {
+                    holder.txtEstado.setText("Enfermo: " + amenaza.getNombre());
+                }
+                @Override
+                public void onError(Exception e) {
+                    holder.txtEstado.setText("Enfermo");
+                }
+            });
+        }
 
         holder.btnEditar.setOnClickListener(v -> listener.onEditar(cultivo));
         holder.btnEliminar.setOnClickListener(v -> listener.onEliminar(cultivo));
@@ -220,45 +206,6 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
                 .into(imgView);
     }
 
-    private void mostrarConflictos(ViewHolder holder, List<String> conflictosIds) {
-        if (conflictosIds.isEmpty()) {
-            holder.txtIncompatibilidades.post(() ->
-                    holder.txtIncompatibilidades.setVisibility(View.GONE));
-            return;
-        }
-
-        List<String> nombres = new ArrayList<>();
-        final int[] pendientes = {conflictosIds.size()};
-
-        for (String incompId : conflictosIds) {
-            plantaDAO.getPlantaById(incompId, new PlantaDAO.OnPlantaLoadedCallback() {
-                @Override
-                public void onLoaded(Planta p) {
-                    nombres.add(p.getNombre());
-                    pendientes[0]--;
-                    if (pendientes[0] == 0) {
-                        String texto = "⚠️ Incompatibilidad detectada con: " + String.join(", ", nombres);
-                        holder.txtIncompatibilidades.post(() -> {
-                            holder.txtIncompatibilidades.setText(texto);
-                            holder.txtIncompatibilidades.setVisibility(View.VISIBLE);
-                        });
-                    }
-                }
-                @Override
-                public void onError(Exception e) {
-                    pendientes[0]--;
-                    if (pendientes[0] == 0 && !nombres.isEmpty()) {
-                        String texto = "⚠️ Incompatibilidad detectada con: " + String.join(", ", nombres);
-                        holder.txtIncompatibilidades.post(() -> {
-                            holder.txtIncompatibilidades.setText(texto);
-                            holder.txtIncompatibilidades.setVisibility(View.VISIBLE);
-                        });
-                    }
-                }
-            });
-        }
-    }
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgCultivo;
         ImageView iconWarning;
@@ -267,24 +214,28 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
         TextView txtEstado;
         TextView txtFechaSiembra;
         TextView txtNotas;
-        TextView txtIncompatibilidades;
         Button btnEditar;
         Button btnEliminar;
-        ValueEventListener plantaListener;
-        String ultimoPlantaId;
+        TextView txtIncompatibilidades;
+
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             imgCultivo = itemView.findViewById(R.id.imgCultivo);
-            iconWarning = itemView.findViewById(R.id.iconWarning);
             txtNombrePlanta = itemView.findViewById(R.id.txtNombrePlanta);
             txtCantidad = itemView.findViewById(R.id.txtCantidadCultivo);
             txtEstado = itemView.findViewById(R.id.txtEstadoCultivo);
             txtFechaSiembra = itemView.findViewById(R.id.txtFechaSiembra);
             txtNotas = itemView.findViewById(R.id.txtNotasCultivo);
-            txtIncompatibilidades = itemView.findViewById(R.id.txtIncompatibilidades);
             btnEditar = itemView.findViewById(R.id.btnEditarCultivo);
             btnEliminar = itemView.findViewById(R.id.btnEliminarCultivo);
+            txtIncompatibilidades = itemView.findViewById(R.id.txtIncompatibilidades);
         }
     }
+
+    public void setPlantasEnHuerto(List<String> plantasIds) {
+        this.todasLasPlantasIds = plantasIds;
+    }
+
+
 }
