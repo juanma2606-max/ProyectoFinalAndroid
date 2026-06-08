@@ -15,6 +15,7 @@ import androidx.cardview.widget.CardView;
 import com.example.proyectofinal.R;
 import com.example.proyectofinal.dao.HuertoDAO;
 import com.example.proyectofinal.modelos.Huerto;
+import com.example.proyectofinal.utils.SnackbarHelper;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class EditarHuertoActivity extends AppCompatActivity {
@@ -34,6 +35,7 @@ public class EditarHuertoActivity extends AppCompatActivity {
 
     private HuertoDAO huertoDAO;
     private String huertoId;
+    private String propietarioUid;
     private Huerto huertoActual;
 
     @Override
@@ -43,6 +45,7 @@ public class EditarHuertoActivity extends AppCompatActivity {
 
         huertoDAO = new HuertoDAO();
         huertoId = getIntent().getStringExtra("huertoId");
+        propietarioUid = getIntent().getStringExtra("adminUid");
 
         if (huertoId == null || huertoId.isEmpty()) {
             Toast.makeText(this, "Error: ID inválido", Toast.LENGTH_SHORT).show();
@@ -116,20 +119,33 @@ public class EditarHuertoActivity extends AppCompatActivity {
     }
 
     private void cargarHuerto() {
-        huertoDAO.getHuertoById(huertoId, new HuertoDAO.OnHuertoLoadedCallback() {
-            @Override
-            public void onLoaded(Huerto huerto) {
-                huertoActual = huerto;
-                mostrarDatos(huerto);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Toast.makeText(EditarHuertoActivity.this,
-                        "Error al cargar huerto", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
+        if (propietarioUid != null && !propietarioUid.isEmpty()) {
+            huertoDAO.getHuertoByUidAndId(propietarioUid, huertoId, new HuertoDAO.OnHuertoLoadedCallback() {
+                @Override
+                public void onLoaded(Huerto huerto) {
+                    huertoActual = huerto;
+                    mostrarDatos(huerto);
+                }
+                @Override
+                public void onError(Exception e) {
+                    SnackbarHelper.showError(EditarHuertoActivity.this, "Error al cargar huerto");
+                    finish();
+                }
+            });
+        } else {
+            huertoDAO.getHuertoById(huertoId, new HuertoDAO.OnHuertoLoadedCallback() {
+                @Override
+                public void onLoaded(Huerto huerto) {
+                    huertoActual = huerto;
+                    mostrarDatos(huerto);
+                }
+                @Override
+                public void onError(Exception e) {
+                    SnackbarHelper.showError(EditarHuertoActivity.this, "Error al cargar huerto");
+                    finish();
+                }
+            });
+        }
     }
 
     private void mostrarDatos(Huerto huerto) {
@@ -213,20 +229,28 @@ public class EditarHuertoActivity extends AppCompatActivity {
 
         btnGuardar.setEnabled(false);
 
-        huertoDAO.updateHuerto(huertoActual, new HuertoDAO.OnCompleteCallback() {
-            @Override
-            public void onSuccess() {
-                Toast.makeText(EditarHuertoActivity.this,
-                        "Huerto actualizado", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-
-            @Override
-            public void onError(String message) {
-                btnGuardar.setEnabled(true);
-                Toast.makeText(EditarHuertoActivity.this,
-                        "Error: " + message, Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (propietarioUid != null && !propietarioUid.isEmpty()) {
+            huertoDAO.updateHuertoForUser(propietarioUid, huertoActual, new HuertoDAO.OnCompleteCallback() {
+                @Override public void onSuccess() {
+                    SnackbarHelper.showSuccess(EditarHuertoActivity.this, "Huerto actualizado ✅");
+                    finish();
+                }
+                @Override public void onError(String message) {
+                    btnGuardar.setEnabled(true);
+                    SnackbarHelper.showError(EditarHuertoActivity.this, "Error: " + message);
+                }
+            });
+        } else {
+            huertoDAO.updateHuerto(huertoActual, new HuertoDAO.OnCompleteCallback() {
+                @Override public void onSuccess() {
+                    SnackbarHelper.showSuccess(EditarHuertoActivity.this, "Huerto actualizado ✅");
+                    finish();
+                }
+                @Override public void onError(String message) {
+                    btnGuardar.setEnabled(true);
+                    SnackbarHelper.showError(EditarHuertoActivity.this, "Error: " + message);
+                }
+            });
+        }
     }
 }

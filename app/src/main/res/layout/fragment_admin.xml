@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#1B2A1B">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:text="Panel de administración"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:background="#2E7D32" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutAdmin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#263226"
+        app:tabTextColor="#A5D6A7"
+        app:tabSelectedTextColor="#FFFFFF"
+        app:tabIndicatorColor="#4CAF50">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Usuarios" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Plantas" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Amenazas" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <!-- PANEL USUARIOS -->
+    <LinearLayout
+        android:id="@+id/panelUsuarios"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxStrokeColor="#FFFFFF"
+            app:boxStrokeWidth="1dp"
+            app:boxBackgroundColor="@color/white"
+            app:hintTextColor="#FFFFFF"
+            app:placeholderTextColor="#FFFFFF">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etBuscarUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Buscar usuario..."
+                android:textColor="#FFFFFF"
+                android:textColorHint="#CCCCCC" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:id="@+id/listaUsuarios"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp" />
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
+    <!-- PANEL PLANTAS -->
+    <LinearLayout
+        android:id="@+id/panelPlantas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                app:boxBackgroundColor="@color/white"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etBuscarPlanta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Buscar planta..."
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#A5D6A7" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNuevaPlanta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+ Nueva"
+                android:backgroundTint="#2E7D32" />
+
+        </LinearLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:id="@+id/listaPlantas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp" />
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
+    <!-- PANEL AMENAZAS -->
+    <LinearLayout
+        android:id="@+id/panelAmenazas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                app:boxBackgroundColor="@color/white"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etBuscarAmenaza"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Buscar amenaza..."
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#A5D6A7" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNuevaAmenaza"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+ Nueva"
+                android:backgroundTint="#2E7D32" />
+
+        </LinearLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:id="@+id/listaAmenazas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp" />
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
+</LinearLayout>

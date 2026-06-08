@@ -265,4 +265,22 @@ public class HuertoDAO {
     public interface OnCountCallback {
         void onCount(int count);
     }
+    public void updateHuertoForUser(String uid, Huerto huerto, OnCompleteCallback callback) {
+        DatabaseReference ref = getHuertosRefForUser(uid);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("nombre", huerto.getNombre());
+        data.put("descripcion", huerto.getDescripcion());
+        data.put("foto", huerto.getFoto());
+        data.put("ubicacion", huerto.getUbicacion());
+        data.put("superficie", huerto.getSuperficie());
+        data.put("tipo_suelo", huerto.getTipo_suelo());
+        data.put("horas_sol", huerto.getHoras_sol());
+        data.put("tiene_riego", huerto.getTiene_riego());
+        data.put("notas", huerto.getNotas());
+
+        ref.child(huerto.getId()).updateChildren(data)
+                .addOnSuccessListener(unused -> callback.onSuccess())
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
+    }
 }

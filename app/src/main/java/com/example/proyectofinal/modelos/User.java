@@ -7,7 +7,6 @@ public class User {
     private String uid;
     private String username;
     private String email;
-    private Boolean admin;
     private Boolean baneado;
     private String motivoBaneo;
     private String fotoPerfil;
@@ -21,7 +20,6 @@ public class User {
         this.uid = uid;
         this.username = username;
         this.email = email;
-        this.admin = false;
         this.baneado = false;
         this.motivoBaneo = null;
         this.fotoPerfil = "avatar2.webp"; // Foto por defecto (actualizada de perfil1.png)
@@ -32,7 +30,6 @@ public class User {
         this.uid = uid;
         this.username = username;
         this.email = email;
-        this.admin = admin != null ? admin : false;
         this.baneado = baneado != null ? baneado : false;
         this.motivoBaneo = motivoBaneo;
         this.fotoPerfil = "avatar2.webp"; // Foto por defecto (actualizada de perfil1.png)
@@ -49,10 +46,6 @@ public class User {
 
     public String getEmail() {
         return email;
-    }
-
-    public Boolean getAdmin() {
-        return admin != null ? admin : false;
     }
 
     public Boolean getBaneado() {
@@ -79,11 +72,6 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
-
-    public void setAdmin(Boolean admin) {
-        this.admin = admin;
-    }
-
     public void setBaneado(Boolean baneado) {
         this.baneado = baneado;
     }
@@ -97,10 +85,6 @@ public class User {
     }
 
     // Métodos de utilidad
-    public boolean esAdmin() {
-        return admin != null && admin;
-    }
-
     public boolean estaBaneado() {
         return baneado != null && baneado;
     }
@@ -111,7 +95,6 @@ public class User {
                 "uid='" + uid + '\'' +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", admin=" + admin +
                 ", baneado=" + baneado +
                 ", motivoBaneo='" + motivoBaneo + '\'' +
                 ", fotoPerfil='" + fotoPerfil + '\'' +

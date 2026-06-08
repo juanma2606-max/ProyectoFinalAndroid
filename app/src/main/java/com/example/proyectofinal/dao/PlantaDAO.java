@@ -59,11 +59,20 @@ public class PlantaDAO {
         plantasRef.removeEventListener(listener);
     }
 
+    /**
+     * Detener escucha en un nodo específico
+     */
+    public void removeListener(String id, ValueEventListener listener) {
+        if (id != null && listener != null) {
+            plantasRef.child(id).removeEventListener(listener);
+        }
+    }
+
     // ---------------------------------------------------------
     // Obtener una planta por ID
     // ---------------------------------------------------------
     public void getPlantaById(String id, ValueEventListener listener) {
-        plantasRef.child(id).addListenerForSingleValueEvent(listener);
+        plantasRef.child(id).addValueEventListener(listener);
     }
 
     // ---------------------------------------------------------

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -110,6 +111,21 @@
                 android:textColor="#856404"
                 android:layout_marginBottom="8dp"
                 android:visibility="gone" />
+
+            <!-- INCOMPATIBILIDADES (visible solo si hay conflictos) -->
+            <TextView
+                android:id="@+id/txtIncompatibilidades"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFEBEE"
+                android:padding="6dp"
+                android:text="⚠️ Hay plantas incompatibles en tu huerto"
+                android:textSize="10sp"
+                android:textColor="#C62828"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
+
 
             <!-- BOTONES DE ACCIÓN -->
             <LinearLayout

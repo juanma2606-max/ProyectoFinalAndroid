@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#1B2A1B">
+
+    <!-- BARRA SUPERIOR -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="#2E7D32"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/txtTituloPlantaForm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nueva planta"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+    <!-- CONTENIDO SCROLLEABLE -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="Nombre *"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxBackgroundColor="#FFFFFF"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#A5D6A7">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPlantaNombre"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#1B2A1B" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="Nombre científico"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxBackgroundColor="#FFFFFF"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#A5D6A7">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPlantaNombreCientifico"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#1B2A1B" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="Descripción *"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxBackgroundColor="#FFFFFF"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#A5D6A7">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPlantaDescripcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minLines="3"
+                    android:inputType="textMultiLine"
+                    android:textColor="#1B2A1B" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tipo"
+                android:textColor="#A5D6A7"
+                android:textSize="13sp"
+                android:layout_marginBottom="4dp" />
+
+            <Spinner
+                android:id="@+id/spinnerPlantaTipo"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="#FFFFFF"
+                android:paddingStart="8dp"
+                android:layout_marginBottom="12dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="URL imagen"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxBackgroundColor="#FFFFFF"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#2E7D32">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPlantaImagen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#1B2A1B" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Estaciones"
+                android:textColor="#A5D6A7"
+                android:textSize="13sp"
+                android:layout_marginBottom="4dp" />
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:layout_marginBottom="12dp">
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/cbPrimavera"
+                    android:layout_width="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Primavera"
+                    android:textColor="#FFFFFF"
+                    app:buttonTint="#4CAF50" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/cbVerano"
+                    android:layout_width="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Verano"
+                    android:textColor="#FFFFFF"
+                    app:buttonTint="#4CAF50" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/cbOtono"
+                    android:layout_width="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Otoño"
+                    android:textColor="#FFFFFF"
+                    app:buttonTint="#4CAF50" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/cbInvierno"
+                    android:layout_width="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Invierno"
+                    android:textColor="#FFFFFF"
+                    app:buttonTint="#4CAF50" />
+
+            </GridLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Riego"
+                android:textColor="#A5D6A7"
+                android:textSize="13sp"
+                android:layout_marginBottom="4dp" />
+
+            <Spinner
+                android:id="@+id/spinnerPlantaRiego"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="#FFFFFF"
+                android:paddingStart="8dp"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Luz"
+                android:textColor="#A5D6A7"
+                android:textSize="13sp"
+                android:layout_marginBottom="4dp" />
+
+            <Spinner
+                android:id="@+id/spinnerPlantaLuz"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="#FFFFFF"
+                android:paddingStart="8dp"
+                android:layout_marginBottom="12dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="Abono recomendado *"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxBackgroundColor="#FFFFFF"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#A5D6A7">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPlantaAbono"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#1B2A1B" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="Tiempo de crecimiento (días)"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxBackgroundColor="#FFFFFF"
+                app:boxStrokeColor="#2E7D32"
+                app:hintTextColor="#A5D6A7">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPlantaTiempo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:textColor="#1B2A1B" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Incompatibilidades"
+                android:textColor="#A5D6A7"
+                android:textSize="13sp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:id="@+id/listaIncompatibilidades"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAgregarIncompat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+ Añadir incompatibilidad"
+                android:backgroundTint="#263226"
+                android:layout_marginBottom="16dp"
+                app:strokeColor="#4CAF50"
+                app:strokeWidth="1dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPlantaGuardar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Guardar"
+                    android:backgroundTint="#2E7D32"
+                    android:layout_marginEnd="8dp"
+                    app:cornerRadius="10dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPlantaCancelar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Cancelar"
+                    android:backgroundTint="#555555"
+                    app:cornerRadius="10dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

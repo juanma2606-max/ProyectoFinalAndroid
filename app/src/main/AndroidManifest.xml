@@ -14,6 +14,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProyectoFinal">
         <activity
+            android:name=".activities.AmenazaFormActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.PlantaFormActivity"
+            android:exported="false" />
+        <activity
+            android:name=".fragments.AdminFragment"
+            android:exported="false" />
+        <activity
             android:name=".dialogs.Dialogofotoconpreview"
             android:exported="false" />
         <activity

@@ -28,4 +28,10 @@
         android:title="Ajustes"
         android:icon="@drawable/ic_ajustes"/>
 
+    <item
+        android:id="@+id/nav_admin"
+        android:title="Admin"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:visible="false" />
+
 </menu>

@@ -4,18 +4,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.example.proyectofinal.MusicService;
 import com.example.proyectofinal.R;
+import com.example.proyectofinal.dao.UserDAO;
+import com.example.proyectofinal.fragments.AdminFragment;
 import com.example.proyectofinal.fragments.AjustesFragment;
 import com.example.proyectofinal.fragments.AmenazaFragment;
 import com.example.proyectofinal.fragments.HomeFragment;
 import com.example.proyectofinal.fragments.PlantaFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class ContenedorActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNav;
+    private UserDAO userDAO;
     private boolean musicEnabled = true ;
 
     @Override
@@ -31,6 +36,22 @@ public class ContenedorActivity extends AppCompatActivity {
         }
 
         bottomNav = findViewById(R.id.bottomNav);
+
+        userDAO = new UserDAO();
+        String uid = FirebaseAuth.getInstance().getCurrentUser() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
+                : null;
+
+        String email = FirebaseAuth.getInstance().getCurrentUser() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getEmail()
+                : null;
+
+        if ("admin@huerting.com".equals(email)) {
+            runOnUiThread(() -> {
+                MenuItem adminItem = bottomNav.getMenu().findItem(R.id.nav_admin);
+                if (adminItem != null) adminItem.setVisible(true);
+            });
+        }
 
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment());
@@ -53,7 +74,9 @@ public class ContenedorActivity extends AppCompatActivity {
                 fragment = new AmenazaFragment();
             }else if (id == R.id.nav_ajustes) {
                 fragment = new AjustesFragment();
-            }
+            } else if (id == R.id.nav_admin) {
+            fragment = new AdminFragment();
+        }
 
             return loadFragment(fragment);
         });

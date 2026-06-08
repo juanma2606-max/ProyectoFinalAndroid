@@ -49,28 +49,6 @@ public class UserDAO {
     }
 
     // ---------------------------------------------------------
-    // Verificar si usuario es admin
-    // ---------------------------------------------------------
-    public void isAdmin(String uid, OnAdminCheckCallback callback) {
-        getProfileRef(uid).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User user = snapshot.getValue(User.class);
-                if (user != null) {
-                    callback.onResult(user.esAdmin());
-                } else {
-                    callback.onResult(false);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                callback.onResult(false);
-            }
-        });
-    }
-
-    // ---------------------------------------------------------
     // Verificar si usuario está baneado
     // ---------------------------------------------------------
     public void isBanned(String uid, OnBanCheckCallback callback) {
