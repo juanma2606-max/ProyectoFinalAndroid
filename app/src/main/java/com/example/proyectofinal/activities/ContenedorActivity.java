@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.example.proyectofinal.MusicService;
 import com.example.proyectofinal.R;
 import com.example.proyectofinal.dao.UserDAO;
 import com.example.proyectofinal.fragments.AdminFragment;
@@ -91,34 +90,5 @@ public class ContenedorActivity extends AppCompatActivity {
             return true;
         }
         return false;
-    }
-
-    //Detener música al cerrar la app
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (musicEnabled) {
-            Intent musicIntent = new Intent(this, MusicService.class);
-            stopService(musicIntent);
-            MusicService.stopMusic();
-        }
-    }
-
-    // Pausar música si la app va a segundo plano
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (musicEnabled) {
-            MusicService.pauseMusic();
-        }
-    }
-
-    //Reanudar música al volver a la app
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (musicEnabled) {
-            MusicService.resumeMusic();
-        }
     }
 }
