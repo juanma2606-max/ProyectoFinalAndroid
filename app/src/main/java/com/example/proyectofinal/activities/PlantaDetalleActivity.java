@@ -77,17 +77,32 @@ public class PlantaDetalleActivity extends AppCompatActivity {
                 txtRiego.setText("Riego: " + planta.riego);
                 txtTiempo.setText("Tiempo de crecimiento: " + planta.tiempo_crecimiento);
 
-                // Carga imagen según tipo de planta
-                cargarImagenPorTipo(imgPlanta, planta.tipo);
+                // Imagen: primero URL de Firebase, si no hay, por tipo
+                if (planta.getImagen() != null && !planta.getImagen().isEmpty()) {
+                    Picasso.get()
+                            .load(planta.getImagen())
+                            .placeholder(R.drawable.ic_launcher_background)
+                            .error(R.drawable.ic_launcher_background)
+                            .into(imgPlanta);
+                } else {
+                    cargarImagenPorTipo(imgPlanta, planta.tipo);
+                }
 
-                // Incompatibilidades - verificar null
+                // Incompatibilidades — resolver nombres desde Firebase
                 listIncompatibilidades.removeAllViews();
-                if (planta.incompatibilidades != null) {
-                    for (String item : planta.incompatibilidades) {
-                        TextView t = new TextView(PlantaDetalleActivity.this);
-                        t.setText("• " + item);
-                        t.setTextSize(16);
-                        listIncompatibilidades.addView(t);
+                if (planta.incompatibilidades != null && !planta.incompatibilidades.isEmpty()) {
+                    for (String incompId : planta.incompatibilidades) {
+                        plantasService.getPlantaById(incompId, new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot snap) {
+                                Planta p = snap.getValue(Planta.class);
+                                TextView t = new TextView(PlantaDetalleActivity.this);
+                                t.setText("• " + (p != null ? p.nombre : incompId));
+                                t.setTextSize(16);
+                                listIncompatibilidades.addView(t);
+                            }
+                            @Override public void onCancelled(DatabaseError e) {}
+                        });
                     }
                 } else {
                     TextView t = new TextView(PlantaDetalleActivity.this);
@@ -97,9 +112,9 @@ public class PlantaDetalleActivity extends AppCompatActivity {
                     listIncompatibilidades.addView(t);
                 }
 
-                // Plagas/Amenazas - verificar null
+                // Plagas
                 listPlagas.removeAllViews();
-                if (planta.amenazas != null) {
+                if (planta.amenazas != null && !planta.amenazas.isEmpty()) {
                     for (String plaga : planta.amenazas) {
                         TextView t = new TextView(PlantaDetalleActivity.this);
                         t.setText("• " + plaga);
@@ -114,9 +129,7 @@ public class PlantaDetalleActivity extends AppCompatActivity {
                     listPlagas.addView(t);
                 }
             }
-
-            @Override
-            public void onCancelled(DatabaseError error) {}
+            @Override public void onCancelled(DatabaseError error) {}
         });
     }
 
@@ -126,11 +139,10 @@ public class PlantaDetalleActivity extends AppCompatActivity {
             case "arbol":     nombreArchivo = "manzano.webp"; break;
             case "hierba":    nombreArchivo = "romero.webp";  break;
             case "flor":      nombreArchivo = "rosas.webp";   break;
-            case "hortaliza": nombreArchivo = "tomates.webp"; break;
+            case "hortaliza": nombreArchivo = "tomate.webp";  break; // sin 's'
             case "fruta":     nombreArchivo = "sandias.webp"; break;
-            default:          nombreArchivo = "tomates.webp"; break;
+            default:          nombreArchivo = "tomate.webp";  break;
         }
-
         Picasso.get()
                 .load("file:///android_asset/" + nombreArchivo)
                 .placeholder(R.drawable.ic_launcher_background)

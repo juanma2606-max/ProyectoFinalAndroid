@@ -37,12 +37,12 @@ public class AmenazasDetallesActivity extends AppCompatActivity {
 
         amenazaService = new AmenazaDAO();
 
-        imgAmenaza       = findViewById(R.id.imgAmenazaDetalle);
-        txtNombre        = findViewById(R.id.txtNombreAmenaza);
-        txtTipoBadge     = findViewById(R.id.txtTipoBadge);
-        txtDescripcion   = findViewById(R.id.txtDescripcionAmenaza);
-        txtTratamiento   = findViewById(R.id.txtTratamiento);
-        listSintomas     = findViewById(R.id.listSintomas);
+        imgAmenaza     = findViewById(R.id.imgAmenazaDetalle);
+        txtNombre      = findViewById(R.id.txtNombreAmenaza);
+        txtTipoBadge   = findViewById(R.id.txtTipoBadge);
+        txtDescripcion = findViewById(R.id.txtDescripcionAmenaza);
+        txtTratamiento = findViewById(R.id.txtTratamiento);
+        listSintomas   = findViewById(R.id.listSintomas);
 
         ImageButton btnVolver = findViewById(R.id.btnVolver);
         btnVolver.setOnClickListener(v -> finish());
@@ -78,6 +78,17 @@ public class AmenazasDetallesActivity extends AppCompatActivity {
                     txtTipoBadge.setVisibility(android.view.View.GONE);
                 }
 
+                // Imagen: Firebase primero, si no icono de bicho
+                if (amenaza.imagen != null && !amenaza.imagen.isEmpty()) {
+                    Picasso.get()
+                            .load(amenaza.imagen)
+                            .placeholder(R.drawable.ic_bug)
+                            .error(R.drawable.ic_bug)
+                            .into(imgAmenaza);
+                } else {
+                    imgAmenaza.setImageResource(R.drawable.ic_bug);
+                }
+
                 // Tratamiento
                 if (amenaza.tratamiento != null && !amenaza.tratamiento.isEmpty()) {
                     txtTratamiento.setText(amenaza.tratamiento);
@@ -104,28 +115,10 @@ public class AmenazasDetallesActivity extends AppCompatActivity {
                     listSintomas.setVisibility(android.view.View.GONE);
                     findViewById(R.id.lblSintomas).setVisibility(android.view.View.GONE);
                 }
-
-                // Carga imagen según tipo de amenaza
-                cargarImagenPorTipo(imgAmenaza, amenaza.tipo);
             }
 
             @Override
             public void onCancelled(DatabaseError error) {}
         });
-    }
-
-    private void cargarImagenPorTipo(ImageView imgView, String tipo) {
-        String nombreArchivo;
-        switch (tipo != null ? tipo : "") {
-            case "plaga":       nombreArchivo = "pulgon.webp"; break;
-            case "enfermedad":  nombreArchivo = "mildiu.webp"; break;
-            default:            nombreArchivo = "plaga_generico.webp"; break;
-        }
-
-        Picasso.get()
-                .load("file:///android_asset/" + nombreArchivo)
-                .placeholder(R.drawable.ic_launcher_background)
-                .error(R.drawable.ic_launcher_background)
-                .into(imgView);
     }
 }

@@ -37,6 +37,7 @@ import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 public class AjustesFragment extends Fragment {
 
@@ -136,20 +137,27 @@ public class AjustesFragment extends Fragment {
     }
 
     private void cargarFotoPerfil(String foto) {
-        if (!isAdded() || getContext() == null) return;
+        if (!isAdded() || getContext() == null || imgPerfil == null) return;
 
-        if (foto == null || foto.isEmpty() || foto.contains("perfil")) {
-            foto = "avatar2.webp";
+        if (foto == null || foto.isEmpty()) {
+            imgPerfil.setImageResource(R.drawable.logo);
+            return;
         }
 
+        // Si es URL de Google, cargar con Picasso
+        if (foto.startsWith("http")) {
+            Picasso.get()
+                    .load(foto)
+                    .placeholder(R.drawable.logo)
+                    .error(R.drawable.logo)
+                    .into(imgPerfil);
+            return;
+        }
+
+        // Si es avatar local
         String nombreSinExtension = foto.replace(".webp", "").replace(".png", "").replace(".jpg", "");
         int resId = getResources().getIdentifier(nombreSinExtension, "drawable", getContext().getPackageName());
-
-        if (resId != 0) {
-            imgPerfil.setImageResource(resId);
-        } else {
-            imgPerfil.setImageResource(R.drawable.logo);
-        }
+        imgPerfil.setImageResource(resId != 0 ? resId : R.drawable.logo);
     }
 
     private void mostrarDialogoEditarNombre() {

@@ -20,27 +20,15 @@ public class ContenedorActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNav;
     private UserDAO userDAO;
-    private boolean musicEnabled = true ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contenedor);
 
-        //Iniciar música SOLO si está activada (ej: desde SharedPreferences)
-        if (musicEnabled) {
-            Intent musicIntent = new Intent(this, MusicService.class);
-            startService(musicIntent);
-            MusicService.startMusic(this, R.raw.background_music);
-        }
-
         bottomNav = findViewById(R.id.bottomNav);
 
         userDAO = new UserDAO();
-        String uid = FirebaseAuth.getInstance().getCurrentUser() != null
-                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
-                : null;
-
         String email = FirebaseAuth.getInstance().getCurrentUser() != null
                 ? FirebaseAuth.getInstance().getCurrentUser().getEmail()
                 : null;
@@ -64,18 +52,17 @@ public class ContenedorActivity extends AppCompatActivity {
                 fragment = new HomeFragment();
             } else if (id == R.id.nav_plantas) {
                 fragment = new PlantaFragment();
-
             } else if (id == R.id.nav_chat) {
                 Intent i = new Intent(this, ChatActivity.class);
                 startActivity(i);
                 return true;
-            }else if (id == R.id.nav_amenazas) {
+            } else if (id == R.id.nav_amenazas) {
                 fragment = new AmenazaFragment();
-            }else if (id == R.id.nav_ajustes) {
+            } else if (id == R.id.nav_ajustes) {
                 fragment = new AjustesFragment();
             } else if (id == R.id.nav_admin) {
-            fragment = new AdminFragment();
-        }
+                fragment = new AdminFragment();
+            }
 
             return loadFragment(fragment);
         });

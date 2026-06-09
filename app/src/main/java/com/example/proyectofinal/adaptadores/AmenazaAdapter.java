@@ -46,7 +46,15 @@ public class AmenazaAdapter extends RecyclerView.Adapter<AmenazaAdapter.AmenazaV
         holder.txtNombre.setText(a.nombre);
         holder.txtTipo.setText("plaga".equals(a.tipo) ? "🐛 Plaga" : "🦠 Enfermedad");
 
-        cargarImagenPorTipo(holder.imgAmenaza, a.tipo);
+        if (a.imagen != null && !a.imagen.isEmpty()) {
+            Picasso.get()
+                    .load(a.imagen)
+                    .placeholder(R.drawable.ic_bug)
+                    .error(R.drawable.ic_bug)
+                    .into(holder.imgAmenaza);
+        } else {
+            cargarImagenPorTipo(holder.imgAmenaza, a.tipo);
+        }
 
         holder.itemView.setOnClickListener(v -> listener.onClick(a));
     }
@@ -62,18 +70,7 @@ public class AmenazaAdapter extends RecyclerView.Adapter<AmenazaAdapter.AmenazaV
     }
 
     private void cargarImagenPorTipo(ImageView imgView, String tipo) {
-        String nombreArchivo;
-        switch (tipo != null ? tipo : "") {
-            case "plaga":       nombreArchivo = "pulgon.webp"; break;
-            case "enfermedad":  nombreArchivo = "mildiu.webp"; break;
-            default:            nombreArchivo = "plaga_generico.webp"; break;
-        }
-
-        Picasso.get()
-                .load("file:///android_asset/" + nombreArchivo)
-                .placeholder(R.drawable.ic_launcher_background)
-                .error(R.drawable.ic_launcher_background)
-                .into(imgView);
+        imgView.setImageResource(R.drawable.ic_bug);
     }
 
     static class AmenazaViewHolder extends RecyclerView.ViewHolder {

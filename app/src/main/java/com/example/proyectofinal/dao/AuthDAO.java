@@ -130,6 +130,14 @@ public class AuthDAO {
                             guardarUsuarioGoogle(firebaseUser);
                             callback.onSuccess(firebaseUser);
                         } else {
+                            // Actualizar nombre, email y foto por si han cambiado
+                            Map<String, Object> updates = new HashMap<>();
+                            updates.put("username", firebaseUser.getDisplayName() != null ? firebaseUser.getDisplayName() : "Usuario");
+                            updates.put("email", firebaseUser.getEmail() != null ? firebaseUser.getEmail() : "");
+                            if (firebaseUser.getPhotoUrl() != null) {
+                                updates.put("fotoPerfil", firebaseUser.getPhotoUrl().toString());
+                            }
+                            getProfileRef(firebaseUser.getUid()).updateChildren(updates);
                             // Usuario existente - verificar baneo
                             checkIfBanned(firebaseUser.getUid(), new OnBanCheckCallback() {
                                 @Override
@@ -191,10 +199,13 @@ public class AuthDAO {
                 firebaseUser.getEmail()
         );
 
-        // Guardar en /users/{uid}/profile
+        // Guardar foto de Google
+        if (firebaseUser.getPhotoUrl() != null) {
+            user.setFotoPerfil(firebaseUser.getPhotoUrl().toString());
+        }
+
         getProfileRef(firebaseUser.getUid()).setValue(user);
     }
-
     // ---------------------------------------------------------
     // Cerrar sesión
     // ---------------------------------------------------------
