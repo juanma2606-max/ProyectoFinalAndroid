@@ -15,16 +15,31 @@
         app:cardCornerRadius="16dp"
         app:cardElevation="2dp">
 
-        <TextView
-            android:id="@+id/txtMensajeUser"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:padding="12dp"
-            android:text="Mensaje del usuario"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
-            android:lineSpacingExtra="4dp"
-            android:maxWidth="280dp" />
+            android:maxWidth="280dp">
+
+            <ImageView
+                android:id="@+id/imgMensajeUser"
+                android:layout_width="240dp"
+                android:layout_height="180dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/txtMensajeUser"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mensaje del usuario"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:lineSpacingExtra="4dp" />
+
+        </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 

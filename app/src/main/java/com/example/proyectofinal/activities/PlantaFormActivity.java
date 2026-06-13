@@ -1,22 +1,29 @@
 package com.example.proyectofinal.activities;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.proyectofinal.R;
 import com.example.proyectofinal.dao.PlantaDAO;
 import com.example.proyectofinal.modelos.Planta;
+import com.example.proyectofinal.utils.CloudinaryUploader;
 import com.example.proyectofinal.utils.SnackbarHelper;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputEditText;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +36,10 @@ public class PlantaFormActivity extends AppCompatActivity {
     private MaterialCheckBox cbPrimavera, cbVerano, cbOtono, cbInvierno;
     private LinearLayout listaIncompatibilidades;
     private MaterialButton btnAgregarIncompat, btnGuardar, btnCancelar;
+    private MaterialButton btnSubirImagen;
+    private ImageView imgPreview;
+    private ProgressBar progressSubidaImagen;
+    private ActivityResultLauncher<String> seleccionarImagenLauncher;
 
     private PlantaDAO plantaDAO;
     private List<Planta> todasPlantas = new ArrayList<>();
@@ -42,6 +53,16 @@ public class PlantaFormActivity extends AppCompatActivity {
 
         plantaDAO = new PlantaDAO();
         plantaId = getIntent().getStringExtra("plantaId");
+
+        // Selector de imagen de galería -> subida a Cloudinary
+        seleccionarImagenLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        subirImagenSeleccionada(uri);
+                    }
+                }
+        );
 
         initViews();
         cargarTodasPlantas();
@@ -78,6 +99,12 @@ public class PlantaFormActivity extends AppCompatActivity {
         btnAgregarIncompat = findViewById(R.id.btnAgregarIncompat);
         btnGuardar = findViewById(R.id.btnPlantaGuardar);
         btnCancelar = findViewById(R.id.btnPlantaCancelar);
+
+        btnSubirImagen = findViewById(R.id.btnSubirImagenPlanta);
+        imgPreview = findViewById(R.id.imgPreviewPlanta);
+        progressSubidaImagen = findViewById(R.id.progressSubidaImagen);
+
+        btnSubirImagen.setOnClickListener(v -> seleccionarImagenLauncher.launch("image/*"));
 
         // Spinners
         ArrayAdapter<String> tipoAdapter = new ArrayAdapter<>(this,
@@ -123,6 +150,26 @@ public class PlantaFormActivity extends AppCompatActivity {
                         etNombreCientifico.setText(planta.getNombreCientifico());
                         etDescripcion.setText(planta.getDescripcion());
                         etImagen.setText(planta.getImagen());
+                        imgPreview.setVisibility(View.VISIBLE);
+                        if (planta.getImagen() != null && !planta.getImagen().isEmpty()) {
+                            Picasso.get()
+                                    .load(planta.getImagen())
+                                    .placeholder(R.drawable.ic_planta_placeholder)
+                                    .error(R.drawable.ic_planta_placeholder)
+                                    .into(imgPreview, new com.squareup.picasso.Callback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            android.util.Log.d("PLANTA_IMG", "Preview cargado: " + planta.getImagen());
+                                        }
+
+                                        @Override
+                                        public void onError(Exception e) {
+                                            android.util.Log.e("PLANTA_IMG", "Error cargando preview: " + planta.getImagen(), e);
+                                        }
+                                    });
+                        } else {
+                            imgPreview.setImageResource(R.drawable.ic_planta_placeholder);
+                        }
                         etAbono.setText(planta.getAbono());
                         etTiempoCrecimiento.setText(String.valueOf(planta.getTiempoCrecimiento()));
 
@@ -217,6 +264,36 @@ public class PlantaFormActivity extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+    // ---------------------------------------------------------
+    // Sube la imagen elegida de la galería a Cloudinary y rellena
+    // el campo etImagen con la URL resultante
+    // ---------------------------------------------------------
+    private void subirImagenSeleccionada(Uri uri) {
+        // Vista previa inmediata con la imagen local
+        imgPreview.setVisibility(View.VISIBLE);
+        imgPreview.setImageURI(uri);
+
+        progressSubidaImagen.setVisibility(View.VISIBLE);
+        btnSubirImagen.setEnabled(false);
+
+        CloudinaryUploader.subirImagen(this, uri, new CloudinaryUploader.OnUploadResult() {
+            @Override
+            public void onSuccess(String secureUrl) {
+                progressSubidaImagen.setVisibility(View.GONE);
+                btnSubirImagen.setEnabled(true);
+                etImagen.setText(secureUrl);
+                SnackbarHelper.showSuccess(PlantaFormActivity.this, "Imagen subida ✅");
+            }
+
+            @Override
+            public void onError(String mensaje) {
+                progressSubidaImagen.setVisibility(View.GONE);
+                btnSubirImagen.setEnabled(true);
+                SnackbarHelper.showError(PlantaFormActivity.this, "Error al subir imagen: " + mensaje);
+            }
+        });
     }
 
     private String getEstacion() {

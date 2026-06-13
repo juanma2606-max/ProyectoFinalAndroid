@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.proyectofinal.R;
 import com.example.proyectofinal.adaptadores.CultivoAdapter;
 import com.example.proyectofinal.dao.CultivoDAO;
@@ -254,29 +255,36 @@ public class HuertoDetalleActivity extends AppCompatActivity {
             txtDescripcionHuerto.setText("Sin descripción");
         }
 
-        // IMAGEN - Cargar desde drawable según nombre seleccionado
+        // IMAGEN - drawable local o URL de Cloudinary
         if (huerto.tieneFoto()) {
-            String foto = huerto.getFoto(); // "huerto1.jpg", "huerto2.webp", etc.
+            String foto = huerto.getFoto();
 
-            // Quitar extensión para buscar drawable
-            String nombreSinExtension = foto
-                    .replace(".jpg", "")
-                    .replace(".webp", "")
-                    .replace(".png", "");
-
-            // Buscar drawable por nombre
-            int resId = getResources().getIdentifier(
-                    nombreSinExtension,  // "huerto1", "huerto2", "huerto3"
-                    "drawable",
-                    getPackageName()
-            );
-
-            if (resId != 0) {
-                // Imagen encontrada - cargarla
-                imgHuerto.setImageResource(resId);
+            if (foto.startsWith("http://") || foto.startsWith("https://")) {
+                // URL de Cloudinary → cargar con Glide
+                Glide.with(this)
+                        .load(foto)
+                        .placeholder(android.R.drawable.ic_menu_gallery)
+                        .error(android.R.drawable.ic_menu_gallery)
+                        .centerCrop()
+                        .into(imgHuerto);
             } else {
-                // Imagen no encontrada - placeholder genérico
-                imgHuerto.setImageResource(android.R.drawable.ic_menu_gallery);
+                // Nombre de drawable local → quitar prefijo y extensión
+                String nombreSinExtension = foto
+                        .replace(".jpg", "")
+                        .replace(".webp", "")
+                        .replace(".png", "");
+
+                int resId = getResources().getIdentifier(
+                        nombreSinExtension,
+                        "drawable",
+                        getPackageName()
+                );
+
+                if (resId != 0) {
+                    imgHuerto.setImageResource(resId);
+                } else {
+                    imgHuerto.setImageResource(android.R.drawable.ic_menu_gallery);
+                }
             }
         } else {
             // Sin foto - placeholder genérico

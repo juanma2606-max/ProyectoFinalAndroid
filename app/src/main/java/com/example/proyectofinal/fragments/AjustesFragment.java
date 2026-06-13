@@ -2,6 +2,7 @@ package com.example.proyectofinal.fragments;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.Gravity;
@@ -17,17 +18,22 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.proyectofinal.R;
 import com.example.proyectofinal.activities.LoginActivity;
 import com.example.proyectofinal.dao.AuthDAO;
 import com.example.proyectofinal.dao.UserDAO;
 import com.example.proyectofinal.modelos.User;
+import com.example.proyectofinal.utils.CloudinaryUploader;
+import com.example.proyectofinal.utils.SnackbarHelper;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -37,7 +43,6 @@ import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 public class AjustesFragment extends Fragment {
 
@@ -52,12 +57,11 @@ public class AjustesFragment extends Fragment {
     private User usuarioActual;
     private boolean tienePassword = false;
 
+    private ActivityResultLauncher<String> seleccionarFotoLauncher;
+    private AlertDialog dialogoFotoAbierto;
+
     private final String[] FOTOS_PERFIL = {
-            "avatar2.webp",
-            "avatar3.webp",
-            "avatar4.webp",
-            "avatar5.webp",
-            "avatar6.webp"
+            "avatar2.webp", "avatar3.webp", "avatar4.webp", "avatar5.webp", "avatar6.webp"
     };
 
     @Nullable
@@ -79,6 +83,14 @@ public class AjustesFragment extends Fragment {
         btnCambiarFoto = view.findViewById(R.id.btnCambiarFoto);
         btnCambiarPassword = view.findViewById(R.id.btnCambiarPassword);
         btnLogout = view.findViewById(R.id.btnLogout);
+
+        // Registrar launcher para selección de imagen
+        seleccionarFotoLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) subirFotoPerfil(uri);
+                }
+        );
 
         verificarMetodoAuth();
         cargarUsuario();
@@ -120,9 +132,7 @@ public class AjustesFragment extends Fragment {
                 usuarioActual = snapshot.getValue(User.class);
                 if (usuarioActual == null) return;
 
-                if (usuarioActual.getUid() == null) {
-                    usuarioActual.setUid(uid);
-                }
+                if (usuarioActual.getUid() == null) usuarioActual.setUid(uid);
 
                 txtNombre.setText(usuarioActual.getUsername() != null ? usuarioActual.getUsername() : "Sin nombre");
                 txtEmail.setText(usuarioActual.getEmail() != null ? usuarioActual.getEmail() : "Sin email");
@@ -144,20 +154,137 @@ public class AjustesFragment extends Fragment {
             return;
         }
 
-        // Si es URL de Google, cargar con Picasso
         if (foto.startsWith("http")) {
-            Picasso.get()
-                    .load(foto)
-                    .placeholder(R.drawable.logo)
-                    .error(R.drawable.logo)
-                    .into(imgPerfil);
+            Glide.with(this).load(foto).placeholder(R.drawable.logo).error(R.drawable.logo).circleCrop().into(imgPerfil);
             return;
         }
 
-        // Si es avatar local
         String nombreSinExtension = foto.replace(".webp", "").replace(".png", "").replace(".jpg", "");
         int resId = getResources().getIdentifier(nombreSinExtension, "drawable", getContext().getPackageName());
         imgPerfil.setImageResource(resId != 0 ? resId : R.drawable.logo);
+    }
+
+    private void mostrarDialogoCambiarFoto() {
+        if (usuarioActual == null || !isAdded()) return;
+
+        float density = getResources().getDisplayMetrics().density;
+        int avatarSize = (int) (110 * density);
+        int margin = (int) (10 * density);
+
+        ScrollView scrollView = new ScrollView(requireContext());
+        LinearLayout container = new LinearLayout(requireContext());
+        container.setOrientation(LinearLayout.VERTICAL);
+        container.setPadding(margin, margin, margin, margin);
+
+        // --- Botón subir foto propia ---
+        Button btnSubirFoto = new Button(requireContext());
+        btnSubirFoto.setText("📷  Subir foto desde galería");
+        btnSubirFoto.setTextColor(Color.WHITE);
+        btnSubirFoto.setBackgroundColor(0xFF2E7D32);
+        LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        btnParams.setMargins(0, 0, 0, (int) (16 * density));
+        btnSubirFoto.setLayoutParams(btnParams);
+        btnSubirFoto.setOnClickListener(v -> {
+            if (dialogoFotoAbierto != null) dialogoFotoAbierto.dismiss();
+            seleccionarFotoLauncher.launch("image/*");
+        });
+        container.addView(btnSubirFoto);
+
+        // --- Separador con texto ---
+        TextView txtOAvatar = new TextView(requireContext());
+        txtOAvatar.setText("— o elige un avatar —");
+        txtOAvatar.setTextColor(0xFF999999);
+        txtOAvatar.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams sepParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        sepParams.setMargins(0, 0, 0, (int) (12 * density));
+        txtOAvatar.setLayoutParams(sepParams);
+        container.addView(txtOAvatar);
+
+        // --- Grid de avatares ---
+        GridLayout gridLayout = new GridLayout(requireContext());
+        gridLayout.setColumnCount(2);
+        gridLayout.setAlignmentMode(GridLayout.ALIGN_BOUNDS);
+        gridLayout.setUseDefaultMargins(false);
+
+        final int[] seleccion = {-1};
+        final CardView[] cards = new CardView[FOTOS_PERFIL.length];
+
+        for (int i = 0; i < FOTOS_PERFIL.length; i++) {
+            CardView card = new CardView(requireContext());
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.width = avatarSize;
+            params.height = avatarSize;
+            params.setMargins(margin, margin, margin, margin);
+            params.setGravity(Gravity.CENTER);
+            card.setLayoutParams(params);
+            card.setRadius(20 * density);
+            card.setCardElevation(4 * density);
+            card.setClipToOutline(true);
+
+            ImageView img = new ImageView(requireContext());
+            img.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            String name = FOTOS_PERFIL[i].replace(".webp", "");
+            int resId = getResources().getIdentifier(name, "drawable", requireContext().getPackageName());
+            img.setImageResource(resId != 0 ? resId : R.drawable.logo);
+            img.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            card.addView(img);
+            cards[i] = card;
+
+            final int index = i;
+            card.setOnClickListener(v -> {
+                seleccion[0] = index;
+                for (int j = 0; j < cards.length; j++) {
+                    if (j == index) {
+                        cards[j].setAlpha(1.0f);
+                        cards[j].setCardElevation(15 * density);
+                        cards[j].setCardBackgroundColor(0xFFE8F5E9);
+                    } else {
+                        cards[j].setAlpha(0.4f);
+                        cards[j].setCardElevation(2 * density);
+                        cards[j].setCardBackgroundColor(Color.WHITE);
+                    }
+                }
+            });
+            gridLayout.addView(card);
+        }
+
+        LinearLayout centeringLayout = new LinearLayout(requireContext());
+        centeringLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+        centeringLayout.addView(gridLayout);
+        container.addView(centeringLayout);
+        scrollView.addView(container);
+
+        dialogoFotoAbierto = new AlertDialog.Builder(requireContext())
+                .setTitle("Cambiar foto de perfil")
+                .setView(scrollView)
+                .setPositiveButton("Guardar avatar", (dialog, which) -> {
+                    if (seleccion[0] != -1) guardarFoto(FOTOS_PERFIL[seleccion[0]]);
+                })
+                .setNegativeButton("Cancelar", null)
+                .create();
+
+        dialogoFotoAbierto.show();
+    }
+
+    private void subirFotoPerfil(Uri uri) {
+        if (!isAdded()) return;
+        SnackbarHelper.show(requireActivity(), "Subiendo foto...");
+
+        CloudinaryUploader.subirImagen(requireContext(), uri, new CloudinaryUploader.OnUploadResult() {
+            @Override
+            public void onSuccess(String secureUrl) {
+                guardarFoto(secureUrl);
+            }
+
+            @Override
+            public void onError(String mensaje) {
+                if (isAdded())
+                    SnackbarHelper.showError(requireActivity(), "Error al subir: " + mensaje);
+            }
+        });
     }
 
     private void mostrarDialogoEditarNombre() {
@@ -196,92 +323,9 @@ public class AjustesFragment extends Fragment {
         });
     }
 
-    private void mostrarDialogoCambiarFoto() {
-        if (usuarioActual == null || !isAdded()) return;
-
-        float density = getResources().getDisplayMetrics().density;
-        int avatarSize = (int) (130 * density); // Larger square size
-        int margin = (int) (12 * density);
-
-        ScrollView scrollView = new ScrollView(requireContext());
-        GridLayout gridLayout = new GridLayout(requireContext());
-        gridLayout.setColumnCount(2); // 2 columns to show square photos
-        gridLayout.setPadding(margin, margin, margin, margin);
-        gridLayout.setAlignmentMode(GridLayout.ALIGN_BOUNDS);
-        gridLayout.setUseDefaultMargins(false);
-
-        final int[] seleccion = {-1};
-        final CardView[] cards = new CardView[FOTOS_PERFIL.length];
-
-        for (int i = 0; i < FOTOS_PERFIL.length; i++) {
-            CardView card = new CardView(requireContext());
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.width = avatarSize;
-            params.height = avatarSize;
-            params.setMargins(margin, margin, margin, margin);
-            params.setGravity(Gravity.CENTER);
-            card.setLayoutParams(params);
-            
-            card.setRadius(20 * density); // Rounded corners
-            card.setCardElevation(4 * density);
-            card.setClipToOutline(true);
-
-            ImageView img = new ImageView(requireContext());
-            img.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, 
-                    ViewGroup.LayoutParams.MATCH_PARENT));
-            
-            String name = FOTOS_PERFIL[i].replace(".webp", "");
-            int resId = getResources().getIdentifier(name, "drawable", requireContext().getPackageName());
-            img.setImageResource(resId != 0 ? resId : R.drawable.logo);
-            img.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-            card.addView(img);
-            cards[i] = card;
-
-            final int index = i;
-            card.setOnClickListener(v -> {
-                seleccion[0] = index;
-                for (int j = 0; j < cards.length; j++) {
-                    if (j == index) {
-                        cards[j].setAlpha(1.0f);
-                        cards[j].setCardElevation(15 * density);
-                        cards[j].setCardBackgroundColor(0xFFE8F5E9); // Light green background
-                    } else {
-                        cards[j].setAlpha(0.4f);
-                        cards[j].setCardElevation(2 * density);
-                        cards[j].setCardBackgroundColor(Color.WHITE);
-                    }
-                }
-            });
-            gridLayout.addView(card);
-        }
-
-        // Center the gridLayout inside the scrollView
-        LinearLayout centeringLayout = new LinearLayout(requireContext());
-        centeringLayout.setGravity(Gravity.CENTER_HORIZONTAL);
-        centeringLayout.addView(gridLayout);
-
-        scrollView.addView(centeringLayout);
-
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Seleccionar avatar")
-                .setView(scrollView)
-                .setPositiveButton("Guardar", (dialog, which) -> {
-                    if (seleccion[0] != -1) {
-                        guardarFoto(FOTOS_PERFIL[seleccion[0]]);
-                    }
-                })
-                .setNegativeButton("Cancelar", null)
-                .show();
-    }
-
     private void guardarFoto(String foto) {
         String uid = auth.getUid();
-        if (uid == null) {
-            Toast.makeText(getContext(), "Error: sesión no válida", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        if (uid == null) return;
 
         userDAO.updateProfilePhoto(uid, foto, new UserDAO.OnOperationCallback() {
             @Override
@@ -289,10 +333,11 @@ public class AjustesFragment extends Fragment {
                 if (isAdded()) {
                     if (usuarioActual != null) usuarioActual.setFotoPerfil(foto);
                     cargarFotoPerfil(foto);
-                    Toast.makeText(getContext(), "Foto actualizada", Toast.LENGTH_SHORT).show();
+                    SnackbarHelper.showSuccess(requireActivity(), "Foto actualizada ✓");
                 }
             }
-            @Override public void onError(Exception e) {
+            @Override
+            public void onError(Exception e) {
                 if (isAdded()) Toast.makeText(getContext(), "Error al guardar", Toast.LENGTH_SHORT).show();
             }
         });
@@ -300,7 +345,7 @@ public class AjustesFragment extends Fragment {
 
     private void mostrarDialogoCambiarPassword() {
         if (!tienePassword || !isAdded()) return;
-        
+
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_cambiar_password, null);
         TextInputEditText etActual = dialogView.findViewById(R.id.etPasswordActual);
         TextInputEditText etNueva = dialogView.findViewById(R.id.etPasswordNueva);
@@ -313,7 +358,7 @@ public class AjustesFragment extends Fragment {
                     String pActual = etActual.getText().toString();
                     String pNueva = etNueva.getText().toString();
                     String pConf = etConf.getText().toString();
-                    
+
                     if (pNueva.equals(pConf) && pNueva.length() >= 6) {
                         cambiarPassword(pActual, pNueva);
                     } else {

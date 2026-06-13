@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -101,12 +102,13 @@
                 android:textSize="12sp"
                 android:layout_marginBottom="12dp" />
 
+            <!-- FILA DE 3 FOTOS PREDEFINIDAS -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginBottom="20dp">
+                android:layout_marginBottom="8dp">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardFoto1"
@@ -119,13 +121,11 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
-
                     <ImageView
                         android:id="@+id/imgFoto1"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop" />
-
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -139,13 +139,11 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
-
                     <ImageView
                         android:id="@+id/imgFoto2"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop" />
-
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
@@ -159,16 +157,42 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
-
                     <ImageView
                         android:id="@+id/imgFoto3"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop" />
-
                 </androidx.cardview.widget.CardView>
 
             </LinearLayout>
+
+            <!-- BOTÓN SUBIR FOTO PROPIA -->
+            <Button
+                android:id="@+id/btnSubirFotoHuerto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📷  Subir mi propia foto"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#2E7D32"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- PREVIEW FOTO PROPIA -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardFotoPropia"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:clickable="true"
+                android:focusable="true">
+                <ImageView
+                    android:id="@+id/imgFotoPropia"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_planta_placeholder"/>
+            </androidx.cardview.widget.CardView>
 
             <!-- RESTO DEL FORMULARIO IGUAL -->
             <TextView

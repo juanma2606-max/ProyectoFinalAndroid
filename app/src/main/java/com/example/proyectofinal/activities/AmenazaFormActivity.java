@@ -1,21 +1,28 @@
 package com.example.proyectofinal.activities;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.view.View;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.proyectofinal.R;
 import com.example.proyectofinal.dao.AmenazaDAO;
 import com.example.proyectofinal.modelos.Amenaza;
+import com.example.proyectofinal.utils.CloudinaryUploader;
 import com.example.proyectofinal.utils.SnackbarHelper;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +33,10 @@ public class AmenazaFormActivity extends AppCompatActivity {
     private Spinner spinnerTipo;
     private LinearLayout listaSintomas;
     private MaterialButton btnAgregarSintoma, btnGuardar, btnCancelar;
+    private MaterialButton btnSubirImagen;
+    private ImageView imgPreview;
+    private ProgressBar progressSubidaImagen;
+    private ActivityResultLauncher<String> seleccionarImagenLauncher;
 
     private AmenazaDAO amenazaDAO;
     private List<String> sintomas = new ArrayList<>();
@@ -42,6 +53,16 @@ public class AmenazaFormActivity extends AppCompatActivity {
 
         amenazaDAO = new AmenazaDAO();
         amenazaId = getIntent().getStringExtra("amenazaId");
+
+        // Selector de imagen de galería -> subida a Cloudinary
+        seleccionarImagenLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        subirImagenSeleccionada(uri);
+                    }
+                }
+        );
 
         initViews();
 
@@ -69,6 +90,12 @@ public class AmenazaFormActivity extends AppCompatActivity {
         btnGuardar = findViewById(R.id.btnAmenazaGuardar);
         btnCancelar = findViewById(R.id.btnAmenazaCancelar);
 
+        btnSubirImagen = findViewById(R.id.btnSubirImagenAmenaza);
+        imgPreview = findViewById(R.id.imgPreviewAmenaza);
+        progressSubidaImagen = findViewById(R.id.progressSubidaImagen);
+
+        btnSubirImagen.setOnClickListener(v -> seleccionarImagenLauncher.launch("image/*"));
+
         ArrayAdapter<String> tipoAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item,
                 new String[]{"plaga", "enfermedad"});
@@ -83,6 +110,26 @@ public class AmenazaFormActivity extends AppCompatActivity {
                 etNombre.setText(amenaza.getNombre());
                 etDescripcion.setText(amenaza.getDescripcion());
                 etImagen.setText(amenaza.getImagen());
+                imgPreview.setVisibility(View.VISIBLE);
+                if (amenaza.getImagen() != null && !amenaza.getImagen().isEmpty()) {
+                    Picasso.get()
+                            .load(amenaza.getImagen())
+                            .placeholder(R.drawable.ic_bug)
+                            .error(R.drawable.ic_bug)
+                            .into(imgPreview, new com.squareup.picasso.Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    android.util.Log.d("AMENAZA_IMG", "Preview cargado: " + amenaza.getImagen());
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    android.util.Log.e("AMENAZA_IMG", "Error cargando preview: " + amenaza.getImagen(), e);
+                                }
+                            });
+                } else {
+                    imgPreview.setImageResource(R.drawable.ic_bug);
+                }
                 etTratamiento.setText(amenaza.getTratamiento());
 
                 if ("enfermedad".equals(amenaza.getTipo())) {
@@ -97,6 +144,36 @@ public class AmenazaFormActivity extends AppCompatActivity {
             public void onError(Exception e) {
                 SnackbarHelper.showError(AmenazaFormActivity.this, "Error al cargar amenaza");
                 finish();
+            }
+        });
+    }
+
+    // ---------------------------------------------------------
+    // Sube la imagen elegida de la galería a Cloudinary y rellena
+    // el campo etImagen con la URL resultante
+    // ---------------------------------------------------------
+    private void subirImagenSeleccionada(Uri uri) {
+        // Vista previa inmediata con la imagen local
+        imgPreview.setVisibility(View.VISIBLE);
+        imgPreview.setImageURI(uri);
+
+        progressSubidaImagen.setVisibility(View.VISIBLE);
+        btnSubirImagen.setEnabled(false);
+
+        CloudinaryUploader.subirImagen(this, uri, new CloudinaryUploader.OnUploadResult() {
+            @Override
+            public void onSuccess(String secureUrl) {
+                progressSubidaImagen.setVisibility(View.GONE);
+                btnSubirImagen.setEnabled(true);
+                etImagen.setText(secureUrl);
+                SnackbarHelper.showSuccess(AmenazaFormActivity.this, "Imagen subida ✅");
+            }
+
+            @Override
+            public void onError(String mensaje) {
+                progressSubidaImagen.setVisibility(View.GONE);
+                btnSubirImagen.setEnabled(true);
+                SnackbarHelper.showError(AmenazaFormActivity.this, "Error al subir imagen: " + mensaje);
             }
         });
     }

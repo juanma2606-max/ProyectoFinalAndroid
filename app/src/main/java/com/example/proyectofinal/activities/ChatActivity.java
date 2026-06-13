@@ -1,11 +1,16 @@
 package com.example.proyectofinal.activities;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +19,8 @@ import com.example.proyectofinal.R;
 import com.example.proyectofinal.adaptadores.ChatAdapter;
 import com.example.proyectofinal.dao.ChatDAO;
 import com.example.proyectofinal.modelos.Mensaje;
+import com.example.proyectofinal.utils.CloudinaryUploader;
+import com.example.proyectofinal.utils.SnackbarHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +36,9 @@ public class ChatActivity extends AppCompatActivity {
     private ChatDAO chatDAO;
 
     private boolean enviando = false;
+    private ImageButton btnAdjuntarImagen;
+    private String imagenPendienteUrl = null;
+    private ActivityResultLauncher<String> seleccionarImagenLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +74,48 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         btnEnviar.setOnClickListener(v -> enviarMensaje());
+        seleccionarImagenLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        subirImagenChat(uri);
+                    }
+                }
+        );
+
+        btnAdjuntarImagen = findViewById(R.id.btnAdjuntarImagen);
+        btnAdjuntarImagen.setOnClickListener(v -> seleccionarImagenLauncher.launch("image/*"));
+        findViewById(R.id.btnQuitarImagen).setOnClickListener(v -> {
+            imagenPendienteUrl = null;
+            findViewById(R.id.layoutPreviewImagen).setVisibility(View.GONE);
+        });
+    }
+
+    private void subirImagenChat(Uri uri) {
+        SnackbarHelper.show(this, "Subiendo imagen...");
+        btnAdjuntarImagen.setEnabled(false);
+
+        // Mostrar preview local inmediatamente
+        ImageView imgPreview = findViewById(R.id.imgPreviewChat);
+        imgPreview.setImageURI(uri);
+        findViewById(R.id.layoutPreviewImagen).setVisibility(View.VISIBLE);
+
+        CloudinaryUploader.subirImagen(this, uri, new CloudinaryUploader.OnUploadResult() {
+            @Override
+            public void onSuccess(String secureUrl) {
+                imagenPendienteUrl = secureUrl;
+                btnAdjuntarImagen.setEnabled(true);
+                SnackbarHelper.showSuccess(ChatActivity.this, "Imagen lista ✓ escribe tu pregunta");
+            }
+
+            @Override
+            public void onError(String mensaje) {
+                imagenPendienteUrl = null;
+                btnAdjuntarImagen.setEnabled(true);
+                findViewById(R.id.layoutPreviewImagen).setVisibility(View.GONE);
+                SnackbarHelper.showError(ChatActivity.this, "Error al subir imagen: " + mensaje);
+            }
+        });
     }
 
     /**
@@ -120,8 +172,8 @@ public class ChatActivity extends AppCompatActivity {
     private void enviarMensaje() {
         String texto = etMensaje.getText().toString().trim();
 
-        if (texto.isEmpty()) {
-            Toast.makeText(this, "Escribe un mensaje", Toast.LENGTH_SHORT).show();
+        if (texto.isEmpty() && imagenPendienteUrl == null) {
+            Toast.makeText(this, "Escribe un mensaje o adjunta una imagen", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -130,31 +182,34 @@ public class ChatActivity extends AppCompatActivity {
             return;
         }
 
-        // Agregar mensaje del usuario
-        Mensaje mensajeUser = new Mensaje("user", texto);
+        // Crear mensaje con o sin imagen
+        Mensaje mensajeUser;
+        if (imagenPendienteUrl != null) {
+            mensajeUser = new Mensaje("user", texto.isEmpty() ? "Analiza esta imagen" : texto, imagenPendienteUrl);
+        } else {
+            mensajeUser = new Mensaje("user", texto);
+        }
+
         mensajes.add(mensajeUser);
         adapter.notifyItemInserted(mensajes.size() - 1);
         scrollAlFinal();
 
-        // Limpiar input
-        etMensaje.setText("");
+        // Limpiar imagen pendiente y ocultar preview
+        imagenPendienteUrl = null;
+        findViewById(R.id.layoutPreviewImagen).setVisibility(View.GONE);
 
-        // Deshabilitar envío
+        etMensaje.setText("");
         enviando = true;
         btnEnviar.setEnabled(false);
         btnEnviar.setText("...");
 
-        // Enviar al backend
         chatDAO.enviarMensaje(mensajes, new ChatDAO.OnChatResponseListener() {
             @Override
             public void onSuccess(String response) {
-                // Agregar respuesta IA
                 Mensaje mensajeIA = new Mensaje("assistant", response);
                 mensajes.add(mensajeIA);
                 adapter.notifyItemInserted(mensajes.size() - 1);
                 scrollAlFinal();
-
-                // Rehabilitar envío
                 enviando = false;
                 btnEnviar.setEnabled(true);
                 btnEnviar.setText("▶");
@@ -162,17 +217,11 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                Toast.makeText(ChatActivity.this,
-                        "Error: " + message,
-                        Toast.LENGTH_SHORT).show();
-
-                // Quitar último mensaje del usuario (falló)
+                Toast.makeText(ChatActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
                 if (!mensajes.isEmpty() && mensajes.get(mensajes.size() - 1).esUsuario()) {
                     mensajes.remove(mensajes.size() - 1);
                     adapter.notifyItemRemoved(mensajes.size());
                 }
-
-                // Rehabilitar envío
                 enviando = false;
                 btnEnviar.setEnabled(true);
                 btnEnviar.setText("▶");

@@ -48,7 +48,10 @@ public class ChatDAO {
     }
 
     /**
-     * Enviar lista de mensajes al backend
+     * Enviar lista de mensajes al backend.
+     * Si un mensaje tiene imagen (tieneImagen() == true), su "content" se envía
+     * como array multimodal [{type: "text", ...}, {type: "image_url", ...}],
+     * que es el formato que espera Grok para analizar imágenes.
      */
     public void enviarMensaje(List<Mensaje> mensajes, OnChatResponseListener listener) {
 
@@ -65,7 +68,29 @@ public class ChatDAO {
             for (Mensaje m : mensajes) {
                 JSONObject msgObj = new JSONObject();
                 msgObj.put("role", m.getRole());
-                msgObj.put("content", m.getContent());
+
+                if (m.tieneImagen()) {
+                    JSONArray contentArray = new JSONArray();
+
+                    // Parte de texto
+                    JSONObject textPart = new JSONObject();
+                    textPart.put("type", "text");
+                    textPart.put("text", m.getContent());
+                    contentArray.put(textPart);
+
+                    // Parte de imagen
+                    JSONObject imagePart = new JSONObject();
+                    imagePart.put("type", "image_url");
+                    JSONObject imageUrlObj = new JSONObject();
+                    imageUrlObj.put("url", m.getImageUrl());
+                    imagePart.put("image_url", imageUrlObj);
+                    contentArray.put(imagePart);
+
+                    msgObj.put("content", contentArray);
+                } else {
+                    msgObj.put("content", m.getContent());
+                }
+
                 messagesArray.put(msgObj);
             }
 

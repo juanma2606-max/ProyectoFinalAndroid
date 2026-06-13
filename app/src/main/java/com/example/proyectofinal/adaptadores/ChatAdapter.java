@@ -4,11 +4,13 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.proyectofinal.R;
 import com.example.proyectofinal.modelos.Mensaje;
 
@@ -29,8 +31,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        Mensaje mensaje = mensajes.get(position);
-        return mensaje.esUsuario() ? VIEW_TYPE_USER : VIEW_TYPE_ASSISTANT;
+        return mensajes.get(position).esUsuario() ? VIEW_TYPE_USER : VIEW_TYPE_ASSISTANT;
     }
 
     @NonNull
@@ -50,7 +51,27 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Mensaje mensaje = mensajes.get(position);
 
         if (holder instanceof UserViewHolder) {
-            ((UserViewHolder) holder).txtMensaje.setText(mensaje.getContent());
+            UserViewHolder userHolder = (UserViewHolder) holder;
+
+            // Mostrar texto (si está vacío y hay imagen, ocultarlo)
+            if (mensaje.getContent() == null || mensaje.getContent().isEmpty()) {
+                userHolder.txtMensaje.setVisibility(View.GONE);
+            } else {
+                userHolder.txtMensaje.setVisibility(View.VISIBLE);
+                userHolder.txtMensaje.setText(mensaje.getContent());
+            }
+
+            // Mostrar imagen si existe
+            if (mensaje.tieneImagen()) {
+                userHolder.imgMensaje.setVisibility(View.VISIBLE);
+                Glide.with(context)
+                        .load(mensaje.getImageUrl())
+                        .centerCrop()
+                        .into(userHolder.imgMensaje);
+            } else {
+                userHolder.imgMensaje.setVisibility(View.GONE);
+            }
+
         } else if (holder instanceof AssistantViewHolder) {
             ((AssistantViewHolder) holder).txtMensaje.setText(mensaje.getContent());
         }
@@ -66,17 +87,17 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         notifyItemInserted(mensajes.size() - 1);
     }
 
-    // ViewHolder Usuario (derecha, verde)
     static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView txtMensaje;
+        ImageView imgMensaje;
 
         UserViewHolder(@NonNull View itemView) {
             super(itemView);
             txtMensaje = itemView.findViewById(R.id.txtMensajeUser);
+            imgMensaje = itemView.findViewById(R.id.imgMensajeUser);
         }
     }
 
-    // ViewHolder Asistente (izquierda, gris)
     static class AssistantViewHolder extends RecyclerView.ViewHolder {
         TextView txtMensaje;
 

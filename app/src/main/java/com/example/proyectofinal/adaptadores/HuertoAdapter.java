@@ -97,30 +97,36 @@ public class HuertoAdapter extends RecyclerView.Adapter<HuertoAdapter.ViewHolder
             holder.txtRiego.setText("💧 " + huerto.getRiegoTexto());
         }
 
-        // Imagen del huerto - cargar desde drawable
+        // Imagen del huerto - drawable local o URL de Cloudinary
         if (huerto.tieneFoto()) {
-            String foto = huerto.getFoto(); // "huerto1.jpg", "huerto2.webp", etc.
+            String foto = huerto.getFoto();
 
-            // Quitar extensión para buscar drawable
-            String nombreSinExtension = foto
-                    .replace("/images/", "")
-                    .replace(".jpg", "")
-                    .replace(".webp", "")
-                    .replace(".png", "");
-
-            // Buscar drawable por nombre
-            int resId = context.getResources().getIdentifier(
-                    nombreSinExtension,  // "huerto1", "huerto2", "huerto3"
-                    "drawable",
-                    context.getPackageName()
-            );
-
-            if (resId != 0) {
-                // Imagen encontrada - cargarla
-                holder.imgHuerto.setImageResource(resId);
+            if (foto.startsWith("http://") || foto.startsWith("https://")) {
+                // URL de Cloudinary → cargar con Picasso
+                Picasso.get()
+                        .load(foto)
+                        .placeholder(android.R.drawable.ic_menu_gallery)
+                        .error(android.R.drawable.ic_menu_gallery)
+                        .into(holder.imgHuerto);
             } else {
-                // Imagen no encontrada - placeholder genérico
-                holder.imgHuerto.setImageResource(android.R.drawable.ic_menu_gallery);
+                // Nombre de drawable local → quitar prefijo y extensión
+                String nombreSinExtension = foto
+                        .replace("/images/", "")
+                        .replace(".jpg", "")
+                        .replace(".webp", "")
+                        .replace(".png", "");
+
+                int resId = context.getResources().getIdentifier(
+                        nombreSinExtension,
+                        "drawable",
+                        context.getPackageName()
+                );
+
+                if (resId != 0) {
+                    holder.imgHuerto.setImageResource(resId);
+                } else {
+                    holder.imgHuerto.setImageResource(android.R.drawable.ic_menu_gallery);
+                }
             }
         } else {
             // Sin foto - placeholder genérico
