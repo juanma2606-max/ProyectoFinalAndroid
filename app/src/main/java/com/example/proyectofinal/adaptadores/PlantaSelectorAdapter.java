@@ -51,8 +51,8 @@ public class PlantaSelectorAdapter extends RecyclerView.Adapter<PlantaSelectorAd
         if (planta.getImagen() != null && !planta.getImagen().isEmpty()) {
             Picasso.get()
                     .load(planta.getImagen())
-                    .placeholder(R.drawable.ic_launcher_background)
-                    .error(R.drawable.ic_launcher_background)
+                    .placeholder(R.drawable.ic_planta_placeholder)
+                    .error(R.drawable.ic_planta_placeholder)
                     .into(holder.imgPlanta);
         } else {
             cargarImagenPorTipo(holder.imgPlanta, planta.getTipo());
@@ -96,20 +96,20 @@ public class PlantaSelectorAdapter extends RecyclerView.Adapter<PlantaSelectorAd
                 nombreArchivo = "rosas.webp";
                 break;
             case "hortaliza":
-                nombreArchivo = "tomates.webp";
+                nombreArchivo = "tomate.webp";
                 break;
             case "fruta":
                 nombreArchivo = "sandias.webp";
                 break;
             default:
-                nombreArchivo = "tomates.webp";
-                break;
+                imgView.setImageResource(R.drawable.ic_planta_placeholder);
+                return;
         }
 
         Picasso.get()
                 .load("file:///android_asset/" + nombreArchivo)
-                .placeholder(R.drawable.ic_launcher_background)
-                .error(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.ic_planta_placeholder)
+                .error(R.drawable.ic_planta_placeholder)
                 .into(imgView);
     }
 

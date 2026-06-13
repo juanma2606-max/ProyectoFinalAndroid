@@ -81,8 +81,8 @@ public class PlantaDetalleActivity extends AppCompatActivity {
                 if (planta.getImagen() != null && !planta.getImagen().isEmpty()) {
                     Picasso.get()
                             .load(planta.getImagen())
-                            .placeholder(R.drawable.ic_launcher_background)
-                            .error(R.drawable.ic_launcher_background)
+                            .placeholder(R.drawable.ic_planta_placeholder)
+                            .error(R.drawable.ic_planta_placeholder)
                             .into(imgPlanta);
                 } else {
                     cargarImagenPorTipo(imgPlanta, planta.tipo);
@@ -139,14 +139,16 @@ public class PlantaDetalleActivity extends AppCompatActivity {
             case "arbol":     nombreArchivo = "manzano.webp"; break;
             case "hierba":    nombreArchivo = "romero.webp";  break;
             case "flor":      nombreArchivo = "rosas.webp";   break;
-            case "hortaliza": nombreArchivo = "tomate.webp";  break; // sin 's'
+            case "hortaliza": nombreArchivo = "tomate.webp";  break;
             case "fruta":     nombreArchivo = "sandias.webp"; break;
-            default:          nombreArchivo = "tomate.webp";  break;
+            default:
+                imgView.setImageResource(R.drawable.ic_planta_placeholder);
+                return;
         }
         Picasso.get()
                 .load("file:///android_asset/" + nombreArchivo)
-                .placeholder(R.drawable.ic_launcher_background)
-                .error(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.ic_planta_placeholder)
+                .error(R.drawable.ic_planta_placeholder)
                 .into(imgView);
     }
 }

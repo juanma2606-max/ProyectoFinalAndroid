@@ -57,6 +57,7 @@ public class EditarCultivoActivity extends AppCompatActivity {
     private Planta plantaSeleccionada = null;
     private String huertoId;
     private String cultivoId;
+    private String adminUid;
     private Cultivo cultivoActual;
     private Calendar calendarioSeleccionado;
 
@@ -77,11 +78,16 @@ public class EditarCultivoActivity extends AppCompatActivity {
 
         huertoId = getIntent().getStringExtra("huertoId");
         cultivoId = getIntent().getStringExtra("cultivoId");
+        adminUid = getIntent().getStringExtra("adminUid");
 
         if (huertoId == null || cultivoId == null) {
             Toast.makeText(this, "Error: datos inválidos", Toast.LENGTH_SHORT).show();
             finish();
             return;
+        }
+
+        if (esModoAdmin() && getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Editar cultivo (admin)");
         }
 
         initViews();
@@ -102,6 +108,13 @@ public class EditarCultivoActivity extends AppCompatActivity {
                 cardAmenazas.setVisibility(View.GONE);
             }
         });
+    }
+
+    // ---------------------------------------------------------
+    // ¿Estamos editando el cultivo de otro usuario?
+    // ---------------------------------------------------------
+    private boolean esModoAdmin() {
+        return adminUid != null && !adminUid.isEmpty();
     }
 
     private void initViews() {
@@ -187,7 +200,7 @@ public class EditarCultivoActivity extends AppCompatActivity {
     }
 
     private void cargarCultivo() {
-        cultivoDAO.getCultivoById(huertoId, cultivoId, new CultivoDAO.OnCultivoLoadedCallback() {
+        CultivoDAO.OnCultivoLoadedCallback callback = new CultivoDAO.OnCultivoLoadedCallback() {
             @Override
             public void onLoaded(Cultivo cultivo) {
                 cultivoActual = cultivo;
@@ -201,7 +214,13 @@ public class EditarCultivoActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
                 finish();
             }
-        });
+        };
+
+        if (esModoAdmin()) {
+            cultivoDAO.getCultivoByIdForUser(adminUid, huertoId, cultivoId, callback);
+        } else {
+            cultivoDAO.getCultivoById(huertoId, cultivoId, callback);
+        }
     }
 
     private void mostrarDatos(Cultivo cultivo) {
@@ -398,7 +417,7 @@ public class EditarCultivoActivity extends AppCompatActivity {
 
         btnGuardar.setEnabled(false);
 
-        cultivoDAO.updateCultivo(huertoId, cultivoActual, new CultivoDAO.OnCompleteCallback() {
+        CultivoDAO.OnCompleteCallback callback = new CultivoDAO.OnCompleteCallback() {
             @Override
             public void onSuccess() {
                 Toast.makeText(EditarCultivoActivity.this,
@@ -412,7 +431,13 @@ public class EditarCultivoActivity extends AppCompatActivity {
                 Toast.makeText(EditarCultivoActivity.this,
                         "Error: " + message, Toast.LENGTH_SHORT).show();
             }
-        });
+        };
+
+        if (esModoAdmin()) {
+            cultivoDAO.updateCultivoForUser(adminUid, huertoId, cultivoActual, callback);
+        } else {
+            cultivoDAO.updateCultivo(huertoId, cultivoActual, callback);
+        }
     }
 
     private String getEstadoSeleccionado() {

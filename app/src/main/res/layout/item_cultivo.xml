@@ -66,33 +66,38 @@
                 android:layout_marginBottom="6dp" />
 
             <!-- ESTADO -->
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Estado: "
-                android:textSize="12sp"
-                android:textColor="#666666" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="6dp">
 
-            <TextView
-                android:id="@+id/txtEstadoCultivo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                android:textColor="#2E7D32"
-                android:layout_marginBottom="6dp" />
+                <ImageView
+                    android:id="@+id/iconWarning"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@android:drawable/ic_dialog_alert"
+                    android:layout_marginEnd="4dp"
+                    android:visibility="gone"
+                    app:tint="#E65100"
+                    android:contentDescription="Cultivo enfermo" />
 
-            <!-- INCOMPATIBILIDADES -->
-            <TextView
-                android:id="@+id/txtIncompatibilidades"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="11sp"
-                android:textColor="#E65100"
-                android:background="#FFF3E0"
-                android:padding="6dp"
-                android:layout_marginBottom="6dp"
-                android:visibility="gone" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Estado: "
+                    android:textSize="12sp"
+                    android:textColor="#666666" />
+
+                <TextView
+                    android:id="@+id/txtEstadoCultivo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="12sp"
+                    android:textColor="#2E7D32" />
+            </LinearLayout>
 
             <!-- NOTAS (visible solo si hay) -->
             <TextView

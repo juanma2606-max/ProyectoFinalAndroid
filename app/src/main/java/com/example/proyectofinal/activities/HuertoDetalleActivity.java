@@ -55,6 +55,7 @@ public class HuertoDetalleActivity extends AppCompatActivity {
     private ValueEventListener cultivoListener;
 
     private String huertoId;
+    private String adminUid;
     private Huerto huertoActual;
 
     private Button btnAnalizarHuerto;
@@ -115,6 +116,9 @@ public class HuertoDetalleActivity extends AppCompatActivity {
                 Intent i = new Intent(HuertoDetalleActivity.this, com.example.proyectofinal.activities.EditarCultivoActivity.class);
                 i.putExtra("huertoId", huertoId);
                 i.putExtra("cultivoId", cultivo.getId());
+                if (esModoAdmin()) {
+                    i.putExtra("adminUid", adminUid);
+                }
                 startActivity(i);
             }
 
@@ -142,6 +146,9 @@ public class HuertoDetalleActivity extends AppCompatActivity {
             btnEditar.setOnClickListener(v -> {
                 Intent i = new Intent(HuertoDetalleActivity.this, EditarHuertoActivity.class);
                 i.putExtra("huertoId", huertoId);
+                if (esModoAdmin()) {
+                    i.putExtra("adminUid", adminUid);
+                }
                 startActivity(i);
             });
         }
@@ -152,6 +159,9 @@ public class HuertoDetalleActivity extends AppCompatActivity {
             fab.setOnClickListener(v -> {
                 Intent i = new Intent(this, AgregarCultivoActivity.class);
                 i.putExtra("huertoId", huertoId);
+                if (esModoAdmin()) {
+                    i.putExtra("adminUid", adminUid);
+                }
                 startActivity(i);
             });
         }
@@ -160,14 +170,26 @@ public class HuertoDetalleActivity extends AppCompatActivity {
 
         // Recibir el ID del huerto
         huertoId = getIntent().getStringExtra("huertoId");
+        adminUid = getIntent().getStringExtra("adminUid");
         if (huertoId == null || huertoId.isEmpty()) {
             Toast.makeText(this, "Error: ID de huerto no válido", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
+        if (esModoAdmin() && getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Huerto (modo admin)");
+        }
+
         cargarHuerto();
         cargarCultivos();
+    }
+
+    // ---------------------------------------------------------
+    // ¿Estamos viendo el huerto de otro usuario como admin?
+    // ---------------------------------------------------------
+    private boolean esModoAdmin() {
+        return adminUid != null && !adminUid.isEmpty();
     }
 
     // ---------------------------------------------------------
@@ -195,7 +217,7 @@ public class HuertoDetalleActivity extends AppCompatActivity {
     // Carga los datos del huerto
     // ---------------------------------------------------------
     private void cargarHuerto() {
-        huertoDAO.getHuertoById(huertoId, new HuertoDAO.OnHuertoLoadedCallback() {
+        HuertoDAO.OnHuertoLoadedCallback callback = new HuertoDAO.OnHuertoLoadedCallback() {
             @Override
             public void onLoaded(Huerto huerto) {
                 huertoActual = huerto;
@@ -209,7 +231,13 @@ public class HuertoDetalleActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
                 finish();
             }
-        });
+        };
+
+        if (esModoAdmin()) {
+            huertoDAO.getHuertoByUidAndId(adminUid, huertoId, callback);
+        } else {
+            huertoDAO.getHuertoById(huertoId, callback);
+        }
     }
 
     // ---------------------------------------------------------
@@ -326,30 +354,41 @@ public class HuertoDetalleActivity extends AppCompatActivity {
             }
         };
 
-        cultivoDAO.getCultivosByHuerto(huertoId, cultivoListener);
+        if (esModoAdmin()) {
+            cultivoDAO.getCultivosByHuertoForUser(adminUid, huertoId, cultivoListener);
+        } else {
+            cultivoDAO.getCultivosByHuerto(huertoId, cultivoListener);
+        }
     }
 
     // ---------------------------------------------------------
     // Eliminar cultivo
     // ---------------------------------------------------------
     private void eliminarCultivo(Cultivo cultivo) {
+        CultivoDAO.OnCompleteCallback callback = new CultivoDAO.OnCompleteCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(HuertoDetalleActivity.this,
+                        "Cultivo eliminado", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(HuertoDetalleActivity.this,
+                        "Error: " + message, Toast.LENGTH_SHORT).show();
+            }
+        };
+
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("¿Eliminar cultivo?")
                 .setMessage("¿Seguro que quieres eliminar este cultivo?\nEsta acción no se puede deshacer.")
-                .setPositiveButton("Eliminar", (d, w) ->
-                        cultivoDAO.removeCultivo(huertoId, cultivo.getId(), new CultivoDAO.OnCompleteCallback() {
-                            @Override
-                            public void onSuccess() {
-                                Toast.makeText(HuertoDetalleActivity.this,
-                                        "Cultivo eliminado", Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onError(String message) {
-                                Toast.makeText(HuertoDetalleActivity.this,
-                                        "Error: " + message, Toast.LENGTH_SHORT).show();
-                            }
-                        }))
+                .setPositiveButton("Eliminar", (d, w) -> {
+                    if (esModoAdmin()) {
+                        cultivoDAO.removeCultivoForUser(adminUid, huertoId, cultivo.getId(), callback);
+                    } else {
+                        cultivoDAO.removeCultivo(huertoId, cultivo.getId(), callback);
+                    }
+                })
                 .setNegativeButton("Cancelar", null)
                 .show();
     }
@@ -367,7 +406,11 @@ public class HuertoDetalleActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (cultivoListener != null) {
-            cultivoDAO.removeListener(huertoId, cultivoListener);
+            if (esModoAdmin()) {
+                cultivoDAO.removeListenerForUser(adminUid, huertoId, cultivoListener);
+            } else {
+                cultivoDAO.removeListener(huertoId, cultivoListener);
+            }
         }
     }
 

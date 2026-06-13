@@ -59,6 +59,7 @@ public class AgregarCultivoActivity extends AppCompatActivity {
     private final List<Amenaza> listaAmenazas = new ArrayList<>();
     private Planta plantaSeleccionada = null;
     private String huertoId;
+    private String adminUid;
     private Calendar calendarioSeleccionado;
 
     @Override
@@ -72,6 +73,11 @@ public class AgregarCultivoActivity extends AppCompatActivity {
         calendarioSeleccionado = Calendar.getInstance();
 
         huertoId = getIntent().getStringExtra("huertoId");
+        adminUid = getIntent().getStringExtra("adminUid");
+
+        if (esModoAdmin() && getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Añadir cultivo (admin)");
+        }
 
         // Inicializar vistas
         rvPlantas = findViewById(R.id.rvPlantas);
@@ -109,6 +115,13 @@ public class AgregarCultivoActivity extends AppCompatActivity {
 
         cargarPlantas();
         cargarAmenazas();
+    }
+
+    // ---------------------------------------------------------
+    // ¿Estamos creando el cultivo en el huerto de otro usuario?
+    // ---------------------------------------------------------
+    private boolean esModoAdmin() {
+        return adminUid != null && !adminUid.isEmpty();
     }
 
     // ---------------------------------------------------------
@@ -295,7 +308,7 @@ public class AgregarCultivoActivity extends AppCompatActivity {
 
         btnGuardar.setEnabled(false);
 
-        cultivoDAO.createCultivo(huertoId, nuevo, new CultivoDAO.OnCompleteCallback() {
+        CultivoDAO.OnCompleteCallback callback = new CultivoDAO.OnCompleteCallback() {
             @Override
             public void onSuccess() {
                 Toast.makeText(AgregarCultivoActivity.this,
@@ -309,7 +322,13 @@ public class AgregarCultivoActivity extends AppCompatActivity {
                 Toast.makeText(AgregarCultivoActivity.this,
                         "Error: " + message, Toast.LENGTH_SHORT).show();
             }
-        });
+        };
+
+        if (esModoAdmin()) {
+            cultivoDAO.createCultivoForUser(adminUid, huertoId, nuevo, callback);
+        } else {
+            cultivoDAO.createCultivo(huertoId, nuevo, callback);
+        }
     }
 
     // ---------------------------------------------------------

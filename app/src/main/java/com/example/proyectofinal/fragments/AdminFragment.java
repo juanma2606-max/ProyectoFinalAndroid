@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -52,6 +53,7 @@ public class AdminFragment extends Fragment {
     private AmenazaDAO amenazaDAO;
     private HuertoDAO huertoDAO = new HuertoDAO();
     private CultivoDAO cultivoDAO = new CultivoDAO();
+    private ValueEventListener usuariosListener;
 
     private List<User> todosUsuarios = new ArrayList<>();
     private List<Planta> todasPlantas = new ArrayList<>();
@@ -155,7 +157,7 @@ public class AdminFragment extends Fragment {
     // USUARIOS
     // -------------------------------------------------------
     private void cargarUsuarios() {
-        userDAO.getAllPersons(new ValueEventListener() {
+        usuariosListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 todosUsuarios.clear();
@@ -176,10 +178,12 @@ public class AdminFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {
                 SnackbarHelper.showError(requireActivity(), "Error al cargar usuarios");
             }
-        });
+        };
+        userDAO.getAllPersons(usuariosListener);
     }
 
     private void filtrarUsuarios(String query) {
+        if (!isAdded() || getContext() == null) return;
         listaUsuarios.removeAllViews();
         for (User user : todosUsuarios) {
             String nombre = user.getUsername() != null ? user.getUsername().toLowerCase() : "";
@@ -388,6 +392,22 @@ public class AdminFragment extends Fragment {
         botonesHuerto.setOrientation(LinearLayout.HORIZONTAL);
         botonesHuerto.setPadding(0, 16, 0, 0);
 
+        MaterialButton btnEntrar = new MaterialButton(requireContext());
+        btnEntrar.setText("Entrar");
+        btnEntrar.setTextSize(11);
+        btnEntrar.setBackgroundTintList(
+                android.content.res.ColorStateList.valueOf(0xFF2E7D32));
+        LinearLayout.LayoutParams btnEntrarParams = new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        btnEntrarParams.setMarginEnd(8);
+        btnEntrar.setLayoutParams(btnEntrarParams);
+        btnEntrar.setOnClickListener(v -> {
+            Intent i = new Intent(getActivity(), com.example.proyectofinal.activities.HuertoDetalleActivity.class);
+            i.putExtra("huertoId", huerto.getId());
+            i.putExtra("adminUid", uid);
+            getActivity().startActivity(i);
+        });
+
         MaterialButton btnEditar = new MaterialButton(requireContext());
         btnEditar.setText("Editar");
         btnEditar.setTextSize(11);
@@ -429,6 +449,7 @@ public class AdminFragment extends Fragment {
                         .show()
         );
 
+        botonesHuerto.addView(btnEntrar);
         botonesHuerto.addView(btnEditar);
         botonesHuerto.addView(btnEliminar);
         layout.addView(botonesHuerto);
@@ -454,6 +475,7 @@ public class AdminFragment extends Fragment {
     }
 
     private void filtrarPlantas(String query) {
+        if (!isAdded() || getContext() == null) return;
         listaPlantas.removeAllViews();
         for (Planta planta : todasPlantas) {
             String nombre = planta.getNombre() != null ? planta.getNombre().toLowerCase() : "";
@@ -474,6 +496,17 @@ public class AdminFragment extends Fragment {
 
         txtNombre.setText(planta.getNombre());
         txtTipo.setText(planta.getTipo() != null ? planta.getTipo() : "");
+
+        ImageView imgPlanta = item.findViewById(R.id.imgPlanta);
+        if (planta.getImagen() != null && !planta.getImagen().isEmpty()) {
+            com.squareup.picasso.Picasso.get()
+                    .load(planta.getImagen())
+                    .placeholder(R.drawable.ic_planta_placeholder)
+                    .error(R.drawable.ic_planta_placeholder)
+                    .into(imgPlanta);
+        } else {
+            imgPlanta.setImageResource(R.drawable.ic_planta_placeholder);
+        }
 
         btnEditar.setOnClickListener(v -> {
             Intent i = new Intent(getActivity(), PlantaFormActivity.class);
@@ -522,6 +555,7 @@ public class AdminFragment extends Fragment {
     }
 
     private void filtrarAmenazas(String query) {
+        if (!isAdded() || getContext() == null) return;
         listaAmenazas.removeAllViews();
         for (Amenaza amenaza : todasAmenazas) {
             String nombre = amenaza.getNombre() != null ? amenaza.getNombre().toLowerCase() : "";
@@ -570,5 +604,12 @@ public class AdminFragment extends Fragment {
         );
 
         return item;
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (usuariosListener != null) {
+            userDAO.removeListener(usuariosListener);
+        }
     }
 }

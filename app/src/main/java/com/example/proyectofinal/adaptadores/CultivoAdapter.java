@@ -105,12 +105,23 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
             holder.txtIncompatibilidades.setVisibility(View.GONE);
         }
 
-        // Consulta secundaria a PlantaDAO para obtener datos de la planta
-        plantaDAO.getPlantaById(cultivo.getPlantaId(), new ValueEventListener() {
+        // Cancelar listener anterior antes de hacer la nueva consulta
+        if (holder.plantaListener != null && holder.ultimoPlantaId != null) {
+            plantaDAO.removeListener(holder.ultimoPlantaId, holder.plantaListener);
+        }
+        holder.ultimoPlantaId = cultivo.getPlantaId();
+
+        // Consulta a PlantaDAO para obtener datos de la planta
+        holder.plantaListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Planta planta = snapshot.getValue(Planta.class);
-                if (planta == null) return;
+                if (planta == null) {
+                    holder.txtNombrePlanta.setText("Planta eliminada");
+                    holder.txtIncompatibilidades.setVisibility(View.GONE);
+                    cargarImagenPorTipo(holder.imgCultivo, null);
+                    return;
+                }
 
                 // Nombre planta
                 holder.txtNombrePlanta.setText(planta.getNombre());
@@ -119,8 +130,8 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
                 if (planta.getImagen() != null && !planta.getImagen().isEmpty()) {
                     Picasso.get()
                             .load(planta.getImagen())
-                            .placeholder(R.drawable.ic_launcher_background)
-                            .error(R.drawable.ic_launcher_background)
+                            .placeholder(R.drawable.ic_planta_placeholder)
+                            .error(R.drawable.ic_planta_placeholder)
                             .into(holder.imgCultivo);
                 } else {
                     cargarImagenPorTipo(holder.imgCultivo, planta.getTipo());
@@ -175,7 +186,9 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
             public void onCancelled(@NonNull DatabaseError error) {
                 holder.txtNombrePlanta.setText("Planta desconocida");
             }
-        });
+        };
+
+        plantaDAO.getPlantaById(cultivo.getPlantaId(), holder.plantaListener);
 
         // Mostrar nombre de amenaza si el cultivo está enfermo
         if (cultivo.estaEnfermo() && cultivo.getAmenazaId() != null) {
@@ -224,12 +237,14 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
             case "flor":      nombreArchivo = "rosas.webp";   break;
             case "hortaliza": nombreArchivo = "tomate.webp";  break;
             case "fruta":     nombreArchivo = "sandias.webp"; break;
-            default:          nombreArchivo = "tomate.webp";  break;
+            default:
+                imgView.setImageResource(R.drawable.ic_planta_placeholder);
+                return;
         }
         Picasso.get()
                 .load("file:///android_asset/" + nombreArchivo)
-                .placeholder(R.drawable.ic_launcher_background)
-                .error(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.ic_planta_placeholder)
+                .error(R.drawable.ic_planta_placeholder)
                 .into(imgView);
     }
 
@@ -244,10 +259,13 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.ViewHold
         Button btnEditar;
         Button btnEliminar;
         TextView txtIncompatibilidades;
+        ValueEventListener plantaListener;
+        String ultimoPlantaId;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             imgCultivo = itemView.findViewById(R.id.imgCultivo);
+            iconWarning = itemView.findViewById(R.id.iconWarning);
             txtNombrePlanta = itemView.findViewById(R.id.txtNombrePlanta);
             txtCantidad = itemView.findViewById(R.id.txtCantidadCultivo);
             txtEstado = itemView.findViewById(R.id.txtEstadoCultivo);

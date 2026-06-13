@@ -106,6 +106,39 @@ public class CultivoDAO {
         });
     }
 
+    // ---------------------------------------------------------
+    // ADMIN: cultivos de un huerto de otro usuario (tiempo real)
+    // ---------------------------------------------------------
+    public void getCultivosByHuertoForUser(String uid, String huertoId, ValueEventListener listener) {
+        getCultivosRefForUser(uid, huertoId).addValueEventListener(listener);
+    }
+
+    public void removeListenerForUser(String uid, String huertoId, ValueEventListener listener) {
+        getCultivosRefForUser(uid, huertoId).removeEventListener(listener);
+    }
+
+    public void getCultivoByIdForUser(String uid, String huertoId, String cultivoId, OnCultivoLoadedCallback callback) {
+        DatabaseReference ref = getCultivosRefForUser(uid, huertoId);
+
+        ref.child(cultivoId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Cultivo cultivo = snapshot.getValue(Cultivo.class);
+                if (cultivo != null) {
+                    cultivo.setId(snapshot.getKey());
+                    callback.onLoaded(cultivo);
+                } else {
+                    callback.onError(new Exception("Cultivo no encontrado"));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError(error.toException());
+            }
+        });
+    }
+
     public void getCultivoById(String huertoId, String cultivoId, OnCultivoLoadedCallback callback) {
         DatabaseReference ref = getCultivosRef(huertoId);
         if (ref == null) {
@@ -145,6 +178,18 @@ public class CultivoDAO {
             return;
         }
 
+        crearCultivoEn(ref, cultivo, callback);
+    }
+
+    // ---------------------------------------------------------
+    // ADMIN: crear cultivo en el huerto de otro usuario
+    // ---------------------------------------------------------
+    public void createCultivoForUser(String uid, String huertoId, Cultivo cultivo, OnCompleteCallback callback) {
+        DatabaseReference ref = getCultivosRefForUser(uid, huertoId);
+        crearCultivoEn(ref, cultivo, callback);
+    }
+
+    private void crearCultivoEn(DatabaseReference ref, Cultivo cultivo, OnCompleteCallback callback) {
         String fecha = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
                 .format(new Date());
 
@@ -172,6 +217,18 @@ public class CultivoDAO {
             return;
         }
 
+        actualizarCultivoEn(ref, cultivo, callback);
+    }
+
+    // ---------------------------------------------------------
+    // ADMIN: actualizar cultivo en el huerto de otro usuario
+    // ---------------------------------------------------------
+    public void updateCultivoForUser(String uid, String huertoId, Cultivo cultivo, OnCompleteCallback callback) {
+        DatabaseReference ref = getCultivosRefForUser(uid, huertoId);
+        actualizarCultivoEn(ref, cultivo, callback);
+    }
+
+    private void actualizarCultivoEn(DatabaseReference ref, Cultivo cultivo, OnCompleteCallback callback) {
         Map<String, Object> data = new HashMap<>();
         data.put("nombre", cultivo.getNombre());
         data.put("cantidad", cultivo.getCantidad());
@@ -241,6 +298,17 @@ public class CultivoDAO {
             callback.onError("Usuario no autenticado");
             return;
         }
+
+        ref.child(cultivoId).removeValue()
+                .addOnSuccessListener(unused -> callback.onSuccess())
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
+    }
+
+    // ---------------------------------------------------------
+    // ADMIN: eliminar cultivo en el huerto de otro usuario
+    // ---------------------------------------------------------
+    public void removeCultivoForUser(String uid, String huertoId, String cultivoId, OnCompleteCallback callback) {
+        DatabaseReference ref = getCultivosRefForUser(uid, huertoId);
 
         ref.child(cultivoId).removeValue()
                 .addOnSuccessListener(unused -> callback.onSuccess())

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+
+    <!-- Círculo verde de fondo -->
+    <path
+        android:fillColor="#2E7D32"
+        android:pathData="M48,4 C70.1,4 88,21.9 88,44 C88,66.1 70.1,84 48,84 C25.9,84 8,66.1 8,44 C8,21.9 25.9,4 48,4 Z" />
+
+    <!-- Icono de zanahoria/planta en blanco -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M48,30 L60,18 L64,22 L58,28 C61,28 64,30 65,33 C67,38 64,44 58,46 L40,64 L30,54 Z" />
+
+</vector>

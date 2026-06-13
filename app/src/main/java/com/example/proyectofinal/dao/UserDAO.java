@@ -39,6 +39,12 @@ public class UserDAO {
         // Obtener todos los perfiles
         usersRef.addValueEventListener(listener);
     }
+    // ---------------------------------------------------------
+// Eliminar listener
+// ---------------------------------------------------------
+    public void removeListener(ValueEventListener listener) {
+        usersRef.removeEventListener(listener);
+    }
 
     // ---------------------------------------------------------
     // Obtener un usuario por ID

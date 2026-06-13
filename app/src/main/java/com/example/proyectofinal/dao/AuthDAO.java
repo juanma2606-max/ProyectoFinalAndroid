@@ -122,47 +122,58 @@ public class AuthDAO {
                             return;
                         }
 
-                        boolean isNewUser = task.getResult().getAdditionalUserInfo() != null
-                                && task.getResult().getAdditionalUserInfo().isNewUser();
-
-                        if (isNewUser) {
-                            // Usuario nuevo de Google
-                            guardarUsuarioGoogle(firebaseUser);
-                            callback.onSuccess(firebaseUser);
-                        } else {
-                            // Actualizar nombre, email y foto por si han cambiado
-                            Map<String, Object> updates = new HashMap<>();
-                            updates.put("username", firebaseUser.getDisplayName() != null ? firebaseUser.getDisplayName() : "Usuario");
-                            updates.put("email", firebaseUser.getEmail() != null ? firebaseUser.getEmail() : "");
-                            if (firebaseUser.getPhotoUrl() != null) {
-                                updates.put("fotoPerfil", firebaseUser.getPhotoUrl().toString());
-                            }
-                            getProfileRef(firebaseUser.getUid()).updateChildren(updates);
-                            // Usuario existente - verificar baneo
-                            checkIfBanned(firebaseUser.getUid(), new OnBanCheckCallback() {
-                                @Override
-                                public void onBanned(boolean isBanned, String motivo) {
-                                    if (isBanned) {
-                                        auth.signOut();
-                                        callback.onBanned(motivo != null ? motivo : "Cuenta suspendida");
-                                    } else {
-                                        callback.onSuccess(firebaseUser);
-                                    }
-                                }
-
-                                @Override
-                                public void onError(Exception e) {
-                                    // Si hay error verificando baneo, permitir login
-                                    callback.onSuccess(firebaseUser);
-                                }
-                            });
-                        }
+                        // No nos fiamos de isNewUser: comprobamos directamente si ya
+                        // existe el nodo "profile" en la base de datos. Esto cubre el
+                        // caso de cuentas de Auth que quedaron sin profile creado.
+                        comprobarYCrearPerfilGoogle(firebaseUser, callback);
                     } else {
                         callback.onError(task.getException() != null
                                 ? task.getException()
                                 : new Exception("Error autenticando con Google"));
                     }
                 });
+    }
+
+    // ---------------------------------------------------------
+    // Comprueba si existe el profile del usuario de Google; si no
+    // existe lo crea, y si existe verifica el baneo.
+    // ---------------------------------------------------------
+    private void comprobarYCrearPerfilGoogle(FirebaseUser firebaseUser, OnLoginResult callback) {
+        getProfileRef(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    // No existe el profile -> lo creamos ahora
+                    android.util.Log.d("GOOGLE_LOGIN", "No existe profile para "
+                            + firebaseUser.getUid() + ", creando...");
+                    guardarUsuarioGoogle(firebaseUser, new OnRegisterResult() {
+                        @Override
+                        public void onSuccess(FirebaseUser user) {
+                            callback.onSuccess(user);
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            callback.onError(e);
+                        }
+                    });
+                } else {
+                    User user = snapshot.getValue(User.class);
+                    if (user != null && user.estaBaneado()) {
+                        auth.signOut();
+                        callback.onBanned(user.getMotivoBaneo() != null
+                                ? user.getMotivoBaneo() : "Cuenta suspendida");
+                    } else {
+                        callback.onSuccess(firebaseUser);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError(error.toException());
+            }
+        });
     }
 
     // ---------------------------------------------------------
@@ -190,8 +201,11 @@ public class AuthDAO {
     // ---------------------------------------------------------
     // Guardar usuario de Google en Realtime Database
     // ---------------------------------------------------------
-    private void guardarUsuarioGoogle(FirebaseUser firebaseUser) {
-        if (firebaseUser == null) return;
+    private void guardarUsuarioGoogle(FirebaseUser firebaseUser, OnRegisterResult callback) {
+        if (firebaseUser == null) {
+            callback.onError(new Exception("FirebaseUser nulo al guardar perfil de Google"));
+            return;
+        }
 
         User user = new User(
                 firebaseUser.getUid(),
@@ -199,12 +213,19 @@ public class AuthDAO {
                 firebaseUser.getEmail()
         );
 
-        // Guardar foto de Google
         if (firebaseUser.getPhotoUrl() != null) {
             user.setFotoPerfil(firebaseUser.getPhotoUrl().toString());
         }
 
-        getProfileRef(firebaseUser.getUid()).setValue(user);
+        getProfileRef(firebaseUser.getUid()).setValue(user)
+                .addOnSuccessListener(aVoid -> {
+                    android.util.Log.d("GOOGLE_LOGIN", "Usuario Google guardado correctamente en DB");
+                    callback.onSuccess(firebaseUser);
+                })
+                .addOnFailureListener(e -> {
+                    android.util.Log.e("GOOGLE_LOGIN", "Error guardando usuario Google: " + e.getMessage(), e);
+                    callback.onError(e);
+                });
     }
     // ---------------------------------------------------------
     // Cerrar sesión
