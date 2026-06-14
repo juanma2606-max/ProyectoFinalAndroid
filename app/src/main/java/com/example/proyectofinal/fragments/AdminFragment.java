@@ -224,6 +224,29 @@ public class AdminFragment extends Fragment {
                     android.content.res.ColorStateList.valueOf(0xFFE65100));
         }
 
+        ImageView imgFotoPerfil = item.findViewById(R.id.imgAdminFotoPerfil);
+        String foto = user.getFotoPerfil();
+
+        if (foto != null && foto.startsWith("http")) {
+            // URL de Cloudinary o Google → Picasso
+            com.squareup.picasso.Picasso.get()
+                    .load(foto)
+                    .placeholder(R.drawable.ic_planta_placeholder)
+                    .error(R.drawable.ic_planta_placeholder)
+                    .into(imgFotoPerfil);
+        } else if (foto != null && !foto.isEmpty()) {
+            // Avatar local → buscar en drawables por nombre
+            String nombreSinExtension = foto.replace(".webp", "").replace(".png", "").replace(".jpg", "");
+            int resId = getResources().getIdentifier(nombreSinExtension, "drawable", requireContext().getPackageName());
+            if (resId != 0) {
+                imgFotoPerfil.setImageResource(resId);
+            } else {
+                imgFotoPerfil.setImageResource(R.drawable.ic_planta_placeholder);
+            }
+        } else {
+            imgFotoPerfil.setImageResource(R.drawable.ic_planta_placeholder);
+        }
+
         // Botón ver huertos
         btnVerHuertos.setOnClickListener(v -> {
             if (panelHuertos.getVisibility() == View.VISIBLE) {
@@ -576,6 +599,17 @@ public class AdminFragment extends Fragment {
 
         txtNombre.setText(amenaza.getNombre());
         txtTipo.setText(amenaza.getTipo() != null ? amenaza.getTipo() : "");
+
+        ImageView imgAmenaza = item.findViewById(R.id.imgAmenaza);
+        if (amenaza.getImagen() != null && !amenaza.getImagen().isEmpty()) {
+            com.squareup.picasso.Picasso.get()
+                    .load(amenaza.getImagen())
+                    .placeholder(R.drawable.ic_planta_placeholder)
+                    .error(R.drawable.ic_planta_placeholder)
+                    .into(imgAmenaza);
+        } else {
+            imgAmenaza.setImageResource(R.drawable.ic_planta_placeholder);
+        }
 
         btnEditar.setOnClickListener(v -> {
             Intent i = new Intent(getActivity(), AmenazaFormActivity.class);
