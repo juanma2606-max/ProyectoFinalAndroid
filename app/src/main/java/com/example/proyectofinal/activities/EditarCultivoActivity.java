@@ -439,6 +439,7 @@ public class EditarCultivoActivity extends AppCompatActivity {
         cultivoActual.setEstado(estado);
         cultivoActual.setNotas(notas);
         cultivoActual.setAmenazaId(amenazaId);
+        cultivoActual.setFechaSiembra(getFechaISO());
 
         btnGuardar.setEnabled(false);
 

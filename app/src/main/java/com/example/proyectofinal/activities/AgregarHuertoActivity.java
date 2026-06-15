@@ -83,8 +83,6 @@ public class AgregarHuertoActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTipoSuelo.setAdapter(adapter);
 
-        etHorasSol.setText("6");
-
         seleccionarFotoLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> { if (uri != null) subirFotoHuerto(uri); }

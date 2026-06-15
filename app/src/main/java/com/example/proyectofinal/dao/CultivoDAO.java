@@ -230,8 +230,10 @@ public class CultivoDAO {
 
     private void actualizarCultivoEn(DatabaseReference ref, Cultivo cultivo, OnCompleteCallback callback) {
         Map<String, Object> data = new HashMap<>();
+
         data.put("nombre", cultivo.getNombre());
-        data.put("plantaId", cultivo.getPlantaId()); // ✅ FIX: antes faltaba esta línea
+        data.put("plantaId", cultivo.getPlantaId());
+        data.put("fecha_siembra", cultivo.getFechaSiembra());
         data.put("cantidad", cultivo.getCantidad());
         data.put("estado", cultivo.getEstado());
         data.put("notas", cultivo.getNotas());
@@ -246,7 +248,6 @@ public class CultivoDAO {
                 .addOnSuccessListener(unused -> callback.onSuccess())
                 .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
-
     public void updateEstado(String huertoId, String cultivoId, String nuevoEstado,
                              OnCompleteCallback callback) {
         DatabaseReference ref = getCultivosRef(huertoId);
