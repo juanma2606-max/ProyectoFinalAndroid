@@ -249,24 +249,49 @@ public class EditarCultivoActivity extends AppCompatActivity {
 
         // Planta (marcar seleccionada cuando carguen)
         if (listaPlantas.isEmpty()) {
-            // Esperar a que carguen plantas
+            // Las plantas aún no han cargado: esperamos y luego marcamos la seleccionada
             plantaDAO.getAllPlantasOnce(new PlantaDAO.OnPlantasLoadedCallback() {
                 @Override
                 public void onLoaded(List<Planta> plantas) {
+                    listaPlantas.clear();
+                    listaPlantas.addAll(plantas);
+
                     for (Planta p : plantas) {
                         if (p.getId().equals(cultivo.getPlantaId())) {
                             plantaSeleccionada = p;
-                            if (plantaAdapter != null) {
-                                plantaAdapter.notifyDataSetChanged();
-                            }
                             break;
                         }
+                    }
+
+                    if (plantaAdapter == null) {
+                        plantaAdapter = new PlantaSelectorAdapter(
+                                EditarCultivoActivity.this,
+                                listaPlantas,
+                                planta -> {
+                                    plantaSeleccionada = planta;
+                                    plantaAdapter.notifyDataSetChanged();
+                                }
+                        );
+                        rvPlantas.setAdapter(plantaAdapter);
+                    } else {
+                        plantaAdapter.notifyDataSetChanged();
                     }
                 }
 
                 @Override
                 public void onError(Exception e) {}
             });
+        } else {
+            // Las plantas ya están cargadas: buscar y marcar la seleccionada directamente
+            for (Planta p : listaPlantas) {
+                if (p.getId().equals(cultivo.getPlantaId())) {
+                    plantaSeleccionada = p;
+                    if (plantaAdapter != null) {
+                        plantaAdapter.notifyDataSetChanged();
+                    }
+                    break;
+                }
+            }
         }
     }
 

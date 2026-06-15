@@ -34,6 +34,15 @@ public class PlantaSelectorAdapter extends RecyclerView.Adapter<PlantaSelectorAd
         this.listener = listener;
     }
 
+    /**
+     * Permite establecer la planta seleccionada desde fuera del adapter
+     * (por ejemplo, al cargar un cultivo existente en EditarCultivoActivity).
+     */
+    public void setPlantaSeleccionada(Planta planta) {
+        this.plantaSeleccionada = planta;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -64,13 +73,13 @@ public class PlantaSelectorAdapter extends RecyclerView.Adapter<PlantaSelectorAd
 
         if (esSeleccionada) {
             holder.card.setCardBackgroundColor(0xFFE8F5E9); // Verde claro
-            holder.card.setCardElevation(8); // Más elevación
+            holder.card.setCardElevation(8);
         } else {
             holder.card.setCardBackgroundColor(0xFFFFFFFF); // Blanco
-            holder.card.setCardElevation(2); // Elevación normal
+            holder.card.setCardElevation(2);
         }
 
-        // Click
+        // Click — el adapter gestiona su propio estado internamente
         holder.itemView.setOnClickListener(v -> {
             plantaSeleccionada = planta;
             listener.onPlantaSeleccionada(planta);
